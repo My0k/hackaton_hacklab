@@ -186,6 +186,62 @@
             text-align: center;
             font-weight: 600;
         }
+        
+        .camera-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .camera-button {
+            background-color: var(--rojo-coral);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .camera-button:hover {
+            background-color: #e54b4e;
+        }
+        
+        .camera-button.secondary {
+            background-color: var(--azul-planeta);
+        }
+        
+        .camera-button.secondary:hover {
+            background-color: #2E8BC0;
+        }
+        
+        .camera-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        #camera-preview {
+            max-height: 400px;
+            object-fit: cover;
+            border: 1px solid #ddd;
+        }
+        
+        @media (max-width: 768px) {
+            .camera-controls {
+                flex-wrap: wrap;
+            }
+            
+            .camera-button {
+                flex: 1;
+                min-width: 120px;
+                text-align: center;
+                padding: 8px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -231,15 +287,40 @@
             <form class="crear-form" method="post" enctype="multipart/form-data">
                 <div class="form-group">
                     <label class="form-label">Foto del Material</label>
+                    
+                    <!-- Contenedor para la cámara -->
+                    <div id="camera-container" style="display: none;">
+                        <video id="camera-preview" autoplay playsinline style="width: 100%; border-radius: 8px;"></video>
+                        <div class="camera-controls">
+                            <button type="button" id="take-photo-btn" class="camera-button">
+                                <i class="fas fa-camera"></i> Capturar
+                            </button>
+                            <button type="button" id="switch-camera-btn" class="camera-button secondary">
+                                <i class="fas fa-sync-alt"></i> Cambiar cámara
+                            </button>
+                            <button type="button" id="cancel-camera-btn" class="camera-button secondary">
+                                <i class="fas fa-times"></i> Cancelar
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Contenedor para subir fotos -->
                     <div class="photo-upload-container" id="photoUploadContainer">
                         <i class="fas fa-camera photo-icon"></i>
                         <p class="photo-upload-text">Haz clic para subir una foto o arrastrar y soltar</p>
                         <img id="photoPreview" class="photo-preview" alt="Vista previa de la foto">
                         <input type="file" id="photoInput" name="photo" accept="image/*" style="display: none;">
+                        <input type="hidden" id="camera-image-data" name="camera_image">
                     </div>
-                    <button type="button" class="mobile-camera-button" id="mobileCameraButton">
-                        <i class="fas fa-camera"></i> Tomar Foto
-                    </button>
+                    
+                    <div class="camera-buttons">
+                        <button type="button" class="mobile-camera-button" id="mobileCameraButton">
+                            <i class="fas fa-camera"></i> Tomar Foto
+                        </button>
+                        <button type="button" class="mobile-camera-button" id="openCameraButton">
+                            <i class="fas fa-video"></i> Abrir Cámara
+                        </button>
+                    </div>
                 </div>
                 
                 <div class="form-group">
@@ -302,24 +383,40 @@
     </footer>
 
     <script>
-        // JavaScript para manejar la subida de fotos
         document.addEventListener('DOMContentLoaded', function() {
+            // Elementos del DOM
             const photoUploadContainer = document.getElementById('photoUploadContainer');
             const photoInput = document.getElementById('photoInput');
             const photoPreview = document.getElementById('photoPreview');
             const mobileCameraButton = document.getElementById('mobileCameraButton');
+            const openCameraButton = document.getElementById('openCameraButton');
+            const cameraContainer = document.getElementById('camera-container');
+            const cameraPreview = document.getElementById('camera-preview');
+            const takePhotoBtn = document.getElementById('take-photo-btn');
+            const switchCameraBtn = document.getElementById('switch-camera-btn');
+            const cancelCameraBtn = document.getElementById('cancel-camera-btn');
+            const cameraImageData = document.getElementById('camera-image-data');
+            
+            // Variables para la cámara
+            let stream = null;
+            let facingMode = 'environment'; // 'environment' es la cámara trasera, 'user' es la cámara frontal
             
             // Manejo del contenedor de upload
             photoUploadContainer.addEventListener('click', function() {
                 photoInput.click();
             });
             
-            // Manejo del botón de cámara móvil
+            // Manejo del botón de cámara móvil - abre el selector nativo
             mobileCameraButton.addEventListener('click', function() {
                 photoInput.click();
             });
             
-            // Previsualización de la foto
+            // Manejo del botón para abrir la cámara
+            openCameraButton.addEventListener('click', function() {
+                startCamera();
+            });
+            
+            // Previsualización de la foto seleccionada del dispositivo
             photoInput.addEventListener('change', function() {
                 if (this.files && this.files[0]) {
                     const reader = new FileReader();
@@ -327,16 +424,112 @@
                     reader.onload = function(e) {
                         photoPreview.src = e.target.result;
                         photoPreview.style.display = 'block';
+                        
+                        // Limpiar el campo de imagen de cámara
+                        cameraImageData.value = '';
                     };
                     
                     reader.readAsDataURL(this.files[0]);
                 }
             });
             
+            // Función para iniciar la cámara
+            function startCamera() {
+                // Ocultar el contenedor de upload y mostrar la cámara
+                photoUploadContainer.style.display = 'none';
+                cameraContainer.style.display = 'block';
+                
+                // Configurar las opciones de la cámara
+                const constraints = {
+                    video: {
+                        facingMode: facingMode,
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    },
+                    audio: false
+                };
+                
+                // Solicitar acceso a la cámara
+                navigator.mediaDevices.getUserMedia(constraints)
+                    .then(function(mediaStream) {
+                        stream = mediaStream;
+                        cameraPreview.srcObject = stream;
+                        cameraPreview.play();
+                    })
+                    .catch(function(error) {
+                        console.error('Error accessing camera:', error);
+                        alert('No se pudo acceder a la cámara. Asegúrate de permitir el acceso a la cámara o usa la opción de subir foto.');
+                        stopCamera();
+                    });
+            }
+            
+            // Función para detener la cámara
+            function stopCamera() {
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                    stream = null;
+                }
+                
+                cameraPreview.srcObject = null;
+                cameraContainer.style.display = 'none';
+                photoUploadContainer.style.display = 'block';
+            }
+            
+            // Capturar foto desde la cámara
+            takePhotoBtn.addEventListener('click', function() {
+                if (!stream) return;
+                
+                // Crear un canvas para capturar la imagen
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                
+                // Establecer dimensiones del canvas
+                canvas.width = cameraPreview.videoWidth;
+                canvas.height = cameraPreview.videoHeight;
+                
+                // Dibujar el frame actual en el canvas
+                context.drawImage(cameraPreview, 0, 0, canvas.width, canvas.height);
+                
+                // Convertir el canvas a una URL de datos
+                const dataURL = canvas.toDataURL('image/jpeg');
+                
+                // Mostrar la vista previa y guardar los datos
+                photoPreview.src = dataURL;
+                photoPreview.style.display = 'block';
+                
+                // Almacenar la imagen en el campo oculto
+                cameraImageData.value = dataURL;
+                
+                // Limpiar el input de archivo para que no haya conflictos
+                photoInput.value = '';
+                
+                // Cerrar la cámara
+                stopCamera();
+            });
+            
+            // Cambiar entre cámaras (frontal/trasera)
+            switchCameraBtn.addEventListener('click', function() {
+                if (!stream) return;
+                
+                // Cambiar el modo de la cámara
+                facingMode = facingMode === 'environment' ? 'user' : 'environment';
+                
+                // Detener la cámara actual
+                stopCamera();
+                
+                // Reiniciar con la nueva configuración
+                startCamera();
+            });
+            
+            // Cancelar el uso de la cámara
+            cancelCameraBtn.addEventListener('click', function() {
+                stopCamera();
+            });
+            
             // Manejar arrastrar y soltar
             photoUploadContainer.addEventListener('dragover', function(e) {
                 e.preventDefault();
-                this.style.borderColor = var(--azul-planeta);
+                this.style.borderColor = '#3B9DD5';
             });
             
             photoUploadContainer.addEventListener('dragleave', function(e) {
@@ -356,6 +549,9 @@
                     reader.onload = function(e) {
                         photoPreview.src = e.target.result;
                         photoPreview.style.display = 'block';
+                        
+                        // Limpiar el campo de imagen de cámara
+                        cameraImageData.value = '';
                     };
                     
                     reader.readAsDataURL(e.dataTransfer.files[0]);

@@ -334,71 +334,139 @@ def materiales_disponibles(material=None, categoria=None):
 @app.route('/crear-revamp', methods=['GET', 'POST'])
 def crear_revamp():
     if request.method == 'POST':
-        # Verificar si hay un archivo en la solicitud
-        if 'photo' not in request.files:
-            return render_template('crear_revamp.html', error="No se seleccionó ninguna imagen")
-        
-        file = request.files['photo']
         details = request.form.get('details', '')
+        camera_image = request.form.get('camera_image', '')
         
-        # Si el usuario no selecciona un archivo
-        if file.filename == '':
-            return render_template('crear_revamp.html', error="No se seleccionó ninguna imagen")
-        
-        if file and allowed_file(file.filename):
-            # Generar un nombre de archivo seguro y único
-            filename = secure_filename(file.filename)
-            # Añadir un identificador único para evitar sobreescrituras
-            unique_filename = f"{uuid.uuid4().hex}_{filename}"
-            
-            # Asegurarse de que el directorio existe
-            os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-            
-            # Guardar el archivo
-            file_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
-            file.save(file_path)
-            
-            # Obtener el siguiente SKU
-            next_sku = get_next_sku()
-            
-            # Preparar nueva fila para el CSV
-            new_product = {
-                'sku': next_sku,
-                'titulo': details[:30],  # Limitar título a 30 caracteres
-                'descripcion': details,
-                'descripcion_larga': '',
-                'costo_transporte': '2000',  # Valor por defecto
-                'descartador': 'Revamper',
-                'imagen_url': unique_filename,
-                'categorias': ''
-            }
-            
-            # Añadir al CSV
+        # Verificar si se envió una imagen de cámara
+        if camera_image and camera_image.startswith('data:image'):
             try:
-                # Verificar si el archivo existe y obtener los encabezados
-                file_exists = os.path.isfile('products.csv')
+                # Extraer los datos de la imagen en base64
+                import base64
+                import re
+                # Extraer el tipo de imagen y los datos
+                image_data = re.sub('^data:image/.+;base64,', '', camera_image)
+                # Decodificar la imagen
+                decoded_image = base64.b64decode(image_data)
                 
-                with open('products.csv', 'a', newline='', encoding='utf-8') as file:
-                    fieldnames = ['sku', 'titulo', 'descripcion', 'descripcion_larga', 
-                                  'costo_transporte', 'descartador', 'imagen_url', 'categorias']
-                    writer = csv.DictWriter(file, fieldnames=fieldnames)
-                    
-                    # Escribir encabezados solo si el archivo es nuevo
-                    if not file_exists:
-                        writer.writeheader()
-                    
-                    writer.writerow(new_product)
+                # Generar un nombre de archivo único
+                unique_filename = f"{uuid.uuid4().hex}.jpg"
                 
-                return render_template('crear_revamp.html', 
-                                      mensaje=f"¡Tu Revamp ha sido creado exitosamente! Producto #{next_sku}")
-            
+                # Asegurarse de que el directorio existe
+                os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+                
+                # Guardar la imagen
+                file_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+                with open(file_path, 'wb') as f:
+                    f.write(decoded_image)
+                
+                # Obtener el siguiente SKU
+                next_sku = get_next_sku()
+                
+                # Preparar nueva fila para el CSV
+                new_product = {
+                    'sku': next_sku,
+                    'titulo': details[:30],  # Limitar título a 30 caracteres
+                    'descripcion': details,
+                    'descripcion_larga': '',
+                    'costo_transporte': '2000',  # Valor por defecto
+                    'descartador': 'Revamper',
+                    'imagen_url': unique_filename,
+                    'categorias': ''
+                }
+                
+                # Añadir al CSV
+                try:
+                    # Verificar si el archivo existe y obtener los encabezados
+                    file_exists = os.path.isfile('products.csv')
+                    
+                    with open('products.csv', 'a', newline='', encoding='utf-8') as file:
+                        fieldnames = ['sku', 'titulo', 'descripcion', 'descripcion_larga', 
+                                      'costo_transporte', 'descartador', 'imagen_url', 'categorias']
+                        writer = csv.DictWriter(file, fieldnames=fieldnames)
+                        
+                        # Escribir encabezados solo si el archivo es nuevo
+                        if not file_exists:
+                            writer.writeheader()
+                        
+                        writer.writerow(new_product)
+                    
+                    return render_template('crear_revamp.html', 
+                                          mensaje=f"¡Tu Revamp ha sido creado exitosamente! Producto #{next_sku}")
+                
+                except Exception as e:
+                    print(f"Error saving to CSV: {e}")
+                    return render_template('crear_revamp.html', 
+                                          error=f"Error al guardar el producto: {str(e)}")
+                
             except Exception as e:
-                print(f"Error saving to CSV: {e}")
+                print(f"Error processing camera image: {e}")
                 return render_template('crear_revamp.html', 
-                                      error=f"Error al guardar el producto: {str(e)}")
+                                      error=f"Error al procesar la imagen: {str(e)}")
+        
+        # Si no hay imagen de cámara, procesar el archivo subido normalmente
+        elif 'photo' in request.files:
+            file = request.files['photo']
+            
+            # Si el usuario no selecciona un archivo
+            if file.filename == '':
+                return render_template('crear_revamp.html', error="No se seleccionó ninguna imagen")
+            
+            if file and allowed_file(file.filename):
+                # Generar un nombre de archivo seguro y único
+                filename = secure_filename(file.filename)
+                # Añadir un identificador único para evitar sobreescrituras
+                unique_filename = f"{uuid.uuid4().hex}_{filename}"
+                
+                # Asegurarse de que el directorio existe
+                os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+                
+                # Guardar el archivo
+                file_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+                file.save(file_path)
+                
+                # Obtener el siguiente SKU
+                next_sku = get_next_sku()
+                
+                # Preparar nueva fila para el CSV
+                new_product = {
+                    'sku': next_sku,
+                    'titulo': details[:30],  # Limitar título a 30 caracteres
+                    'descripcion': details,
+                    'descripcion_larga': '',
+                    'costo_transporte': '2000',  # Valor por defecto
+                    'descartador': 'Revamper',
+                    'imagen_url': unique_filename,
+                    'categorias': ''
+                }
+                
+                # Añadir al CSV
+                try:
+                    # Verificar si el archivo existe y obtener los encabezados
+                    file_exists = os.path.isfile('products.csv')
+                    
+                    with open('products.csv', 'a', newline='', encoding='utf-8') as file:
+                        fieldnames = ['sku', 'titulo', 'descripcion', 'descripcion_larga', 
+                                      'costo_transporte', 'descartador', 'imagen_url', 'categorias']
+                        writer = csv.DictWriter(file, fieldnames=fieldnames)
+                        
+                        # Escribir encabezados solo si el archivo es nuevo
+                        if not file_exists:
+                            writer.writeheader()
+                        
+                        writer.writerow(new_product)
+                    
+                    return render_template('crear_revamp.html', 
+                                          mensaje=f"¡Tu Revamp ha sido creado exitosamente! Producto #{next_sku}")
+                
+                except Exception as e:
+                    print(f"Error saving to CSV: {e}")
+                    return render_template('crear_revamp.html', 
+                                          error=f"Error al guardar el producto: {str(e)}")
+            else:
+                return render_template('crear_revamp.html', 
+                                      error="Formato de archivo no permitido. Use PNG, JPG, JPEG o GIF")
         else:
-            return render_template('crear_revamp.html', 
-                                  error="Formato de archivo no permitido. Use PNG, JPG, JPEG o GIF")
+            return render_template('crear_revamp.html', error="No se proporcionó ninguna imagen")
     
     return render_template('crear_revamp.html')
 

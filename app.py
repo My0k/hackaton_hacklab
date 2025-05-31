@@ -1,8 +1,12 @@
-from flask import Flask, render_template, send_from_directory, request, url_for
+from flask import Flask, render_template, send_from_directory, request, url_for, jsonify
 import os
 import csv
 import uuid
 from werkzeug.utils import secure_filename
+import base64
+import io
+from PIL import Image
+from functions.genera_categorias import generar_categorias, generar_descripcion_larga, generar_titulo
 
 app = Flask(__name__)
 
@@ -17,10 +21,31 @@ def load_products():
         with open('products.csv', 'r', encoding='utf-8') as file:
             csv_reader = csv.DictReader(file)
             for row in csv_reader:
-                # Añadir la ruta completa a las imágenes
-                row['imagen_url'] = url_for('static', filename=f'fotos/{row["imagen_url"]}')
+                # Manejar las imágenes de manera más segura
+                if 'imagen_url' in row:
+                    image_name = row['imagen_url']
+                    
+                    # Evitar rutas duplicadas o erróneas
+                    if image_name.startswith(('/', 'static', 'http')):
+                        # Si ya es una URL completa o ruta absoluta, mantenerla
+                        row['imagen_url'] = image_name
+                    else:
+                        # Si es solo un nombre de archivo, construir la URL
+                        # Verificar primero si el archivo existe
+                        img_path = os.path.join('static', 'fotos', image_name)
+                        if os.path.exists(img_path):
+                            row['imagen_url'] = url_for('static', filename=f'fotos/{image_name}')
+                        else:
+                            # Si no existe, usar una imagen de placeholder
+                            row['imagen_url'] = url_for('static', filename='img/placeholder.png')
+                            print(f"Advertencia: Imagen no encontrada: {image_name}")
+                
                 # Convertir categorías de string a lista
-                row['categorias_lista'] = row['categorias'].split('|')
+                if 'categorias' in row and row['categorias']:
+                    row['categorias_lista'] = row['categorias'].split('|')
+                else:
+                    row['categorias_lista'] = []
+                    
                 products.append(row)
         return products
     except Exception as e:
@@ -59,26 +84,25 @@ def home():
         return f"Error: {str(e)}", 500
 
 @app.route('/marketplace')
-def marketplace():
-    # Obtener el filtro seleccionado de los parámetros de consulta
-    selected_category = request.args.get('categoria', '')
-    
+@app.route('/marketplace/<categoria>')
+def marketplace(categoria=None):
     # Cargar todos los productos
     all_products = load_products()
     
-    # Obtener todas las categorías únicas para los filtros
-    all_categories = get_all_categories(all_products)
+    # Obtener todas las categorías disponibles
+    categories = get_all_categories(all_products)
     
-    # Filtrar productos si se seleccionó una categoría
-    if selected_category:
-        filtered_products = [p for p in all_products if 'categorias_lista' in p and selected_category in p['categorias_lista']]
+    # Filtrar por categoría si se especificó
+    if categoria:
+        filtered_products = [p for p in all_products 
+                          if 'categorias_lista' in p and categoria in p['categorias_lista']]
     else:
         filtered_products = all_products
     
     return render_template('marketplace.html', 
                           products=filtered_products, 
-                          categories=all_categories,
-                          selected_category=selected_category)
+                          categories=categories,
+                          selected_category=categoria)
 
 @app.route('/debug')
 def debug():
@@ -110,47 +134,17 @@ def wellknown(filename):
 def materiales():
     return render_template('materiales.html')
 
-@app.route('/receptor/<receptor>')
-@app.route('/receptor/<receptor>/<categoria>')
-def vista_receptor(receptor, categoria=None):
-    # Cargar todos los productos
+@app.route('/vista_receptor/<receptor>')
+def vista_receptor(receptor):
+    # Ruta para ver los productos por receptor
     all_products = load_products()
     
-    # Cargar todos los materiales
-    all_materials = load_materials()
-    
-    # Crear un diccionario para mapear materiales a sus categorías
-    material_to_categories = {}
-    material_names = []
-    for mat in all_materials:
-        if 'nombre_material' in mat and 'categorias_lista' in mat:
-            material_to_categories[mat['nombre_material']] = mat['categorias_lista']
-            material_names.append(mat['nombre_material'])
-    
-    # Filtrar productos por receptor (descartador)
-    receptor_products = [p for p in all_products if p['descartador'].lower() == receptor.lower()]
-    
-    # Filtrar adicionalmente por categoría si se especifica
-    selected_material = None
-    if categoria:
-        # Determinar a qué material pertenece esta categoría
-        for material, categories in material_to_categories.items():
-            if categoria in categories:
-                selected_material = material
-                break
-        
-        # Filtrar productos por la categoría seleccionada
-        receptor_products = [p for p in receptor_products 
-                           if 'categorias_lista' in p and categoria in p['categorias_lista']]
+    # Filtrar productos del receptor específico
+    receptor_products = [p for p in all_products if p['descartador'] == receptor]
     
     return render_template('receptor.html', 
-                          products=receptor_products,
-                          materials=all_materials,
-                          material_to_categories=material_to_categories,
-                          material_names=material_names,
-                          receptor_name=receptor,
-                          selected_category=categoria,
-                          selected_material=selected_material)
+                          receptor=receptor,
+                          products=receptor_products)
 
 @app.route('/receptores')
 @app.route('/receptores/<categoria>')
@@ -334,139 +328,63 @@ def materiales_disponibles(material=None, categoria=None):
 @app.route('/crear-revamp', methods=['GET', 'POST'])
 def crear_revamp():
     if request.method == 'POST':
-        details = request.form.get('details', '')
-        camera_image = request.form.get('camera_image', '')
-        
-        # Verificar si se envió una imagen de cámara
-        if camera_image and camera_image.startswith('data:image'):
-            try:
-                # Extraer los datos de la imagen en base64
-                import base64
-                import re
-                # Extraer el tipo de imagen y los datos
-                image_data = re.sub('^data:image/.+;base64,', '', camera_image)
-                # Decodificar la imagen
-                decoded_image = base64.b64decode(image_data)
-                
-                # Generar un nombre de archivo único
-                unique_filename = f"{uuid.uuid4().hex}.jpg"
-                
-                # Asegurarse de que el directorio existe
-                os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+        try:
+            # Obtener datos del formulario
+            titulo = request.form.get('title', 'Material Reciclable')
+            descripcion = request.form.get('details', '')
+            descripcion_larga = request.form.get('descripcion_larga', '')
+            categorias = request.form.get('categorias', '')
+            costo_envio = request.form.get('shipping_cost', '1000')
+            
+            # Manejar la imagen
+            imagen_url = ''
+            if 'photo' in request.files and request.files['photo'].filename:
+                # Si se subió un archivo
+                imagen = request.files['photo']
+                # Aquí iría la lógica para guardar la imagen y obtener su URL
+                # Por ejemplo:
+                nombre_archivo = f"{uuid.uuid4()}_{secure_filename(imagen.filename)}"
+                ruta_guardado = os.path.join('static/uploads', nombre_archivo)
+                os.makedirs('static/uploads', exist_ok=True)
+                imagen.save(ruta_guardado)
+                imagen_url = f"/static/uploads/{nombre_archivo}"
+            elif 'camera_image' in request.form and request.form['camera_image']:
+                # Si se capturó una imagen con la cámara (base64)
+                b64_imagen = request.form['camera_image'].split(',')[1] if ',' in request.form['camera_image'] else request.form['camera_image']
+                imagen_bytes = base64.b64decode(b64_imagen)
                 
                 # Guardar la imagen
-                file_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
-                with open(file_path, 'wb') as f:
-                    f.write(decoded_image)
+                nombre_archivo = f"{uuid.uuid4()}.jpg"
+                ruta_guardado = os.path.join('static/uploads', nombre_archivo)
+                os.makedirs('static/uploads', exist_ok=True)
                 
-                # Obtener el siguiente SKU
-                next_sku = get_next_sku()
+                with open(ruta_guardado, 'wb') as f:
+                    f.write(imagen_bytes)
                 
-                # Preparar nueva fila para el CSV
-                new_product = {
-                    'sku': next_sku,
-                    'titulo': details[:30],  # Limitar título a 30 caracteres
-                    'descripcion': details,
-                    'descripcion_larga': '',
-                    'costo_transporte': '2000',  # Valor por defecto
-                    'descartador': 'Revamper',
-                    'imagen_url': unique_filename,
-                    'categorias': ''
-                }
-                
-                # Añadir al CSV
-                try:
-                    # Verificar si el archivo existe y obtener los encabezados
-                    file_exists = os.path.isfile('products.csv')
-                    
-                    with open('products.csv', 'a', newline='', encoding='utf-8') as file:
-                        fieldnames = ['sku', 'titulo', 'descripcion', 'descripcion_larga', 
-                                      'costo_transporte', 'descartador', 'imagen_url', 'categorias']
-                        writer = csv.DictWriter(file, fieldnames=fieldnames)
-                        
-                        # Escribir encabezados solo si el archivo es nuevo
-                        if not file_exists:
-                            writer.writeheader()
-                        
-                        writer.writerow(new_product)
-                    
-                    return render_template('crear_revamp.html', 
-                                          mensaje=f"¡Tu Revamp ha sido creado exitosamente! Producto #{next_sku}")
-                
-                except Exception as e:
-                    print(f"Error saving to CSV: {e}")
-                    return render_template('crear_revamp.html', 
-                                          error=f"Error al guardar el producto: {str(e)}")
-                
-            except Exception as e:
-                print(f"Error processing camera image: {e}")
-                return render_template('crear_revamp.html', 
-                                      error=f"Error al procesar la imagen: {str(e)}")
+                imagen_url = f"/static/uploads/{nombre_archivo}"
+            
+            # Determinar si es descartable (ahora siempre es False ya que eliminamos este campo)
+            descartable = False
+            
+            # Agregar a la base de datos o archivo CSV
+            with open('products.csv', 'a', newline='', encoding='utf-8') as file:
+                writer = csv.writer(file)
+                writer.writerow([
+                    str(uuid.uuid4())[:8],  # Generar un SKU simple
+                    titulo,
+                    descripcion,
+                    descripcion_larga,
+                    costo_envio,
+                    'Sí' if descartable else 'No',
+                    imagen_url,
+                    categorias
+                ])
+            
+            return render_template('crear_revamp.html', mensaje="¡Tu Revamp ha sido creado con éxito!")
         
-        # Si no hay imagen de cámara, procesar el archivo subido normalmente
-        elif 'photo' in request.files:
-            file = request.files['photo']
-            
-            # Si el usuario no selecciona un archivo
-            if file.filename == '':
-                return render_template('crear_revamp.html', error="No se seleccionó ninguna imagen")
-            
-            if file and allowed_file(file.filename):
-                # Generar un nombre de archivo seguro y único
-                filename = secure_filename(file.filename)
-                # Añadir un identificador único para evitar sobreescrituras
-                unique_filename = f"{uuid.uuid4().hex}_{filename}"
-                
-                # Asegurarse de que el directorio existe
-                os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-                
-                # Guardar el archivo
-                file_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
-                file.save(file_path)
-                
-                # Obtener el siguiente SKU
-                next_sku = get_next_sku()
-                
-                # Preparar nueva fila para el CSV
-                new_product = {
-                    'sku': next_sku,
-                    'titulo': details[:30],  # Limitar título a 30 caracteres
-                    'descripcion': details,
-                    'descripcion_larga': '',
-                    'costo_transporte': '2000',  # Valor por defecto
-                    'descartador': 'Revamper',
-                    'imagen_url': unique_filename,
-                    'categorias': ''
-                }
-                
-                # Añadir al CSV
-                try:
-                    # Verificar si el archivo existe y obtener los encabezados
-                    file_exists = os.path.isfile('products.csv')
-                    
-                    with open('products.csv', 'a', newline='', encoding='utf-8') as file:
-                        fieldnames = ['sku', 'titulo', 'descripcion', 'descripcion_larga', 
-                                      'costo_transporte', 'descartador', 'imagen_url', 'categorias']
-                        writer = csv.DictWriter(file, fieldnames=fieldnames)
-                        
-                        # Escribir encabezados solo si el archivo es nuevo
-                        if not file_exists:
-                            writer.writeheader()
-                        
-                        writer.writerow(new_product)
-                    
-                    return render_template('crear_revamp.html', 
-                                          mensaje=f"¡Tu Revamp ha sido creado exitosamente! Producto #{next_sku}")
-                
-                except Exception as e:
-                    print(f"Error saving to CSV: {e}")
-                    return render_template('crear_revamp.html', 
-                                          error=f"Error al guardar el producto: {str(e)}")
-            else:
-                return render_template('crear_revamp.html', 
-                                      error="Formato de archivo no permitido. Use PNG, JPG, JPEG o GIF")
-        else:
-            return render_template('crear_revamp.html', error="No se proporcionó ninguna imagen")
+        except Exception as e:
+            app.logger.error(f"Error en crear_revamp: {str(e)}")
+            return render_template('crear_revamp.html', error=f"Ocurrió un error: {str(e)}")
     
     return render_template('crear_revamp.html')
 
@@ -495,6 +413,129 @@ def get_next_sku():
     except Exception as e:
         print(f"Error getting next SKU: {e}")
         return "001"  # Valor por defecto si hay error
+
+@app.route('/admin/fix-images')
+def fix_images():
+    """Endpoint administrativo para corregir problemas con las imágenes"""
+    try:
+        # Ejecutar la corrección de rutas
+        from fix_image_paths import fix_image_paths
+        fix_image_paths()
+        
+        # Verificar archivos de imagen
+        img_dir = os.path.join('static', 'fotos')
+        if not os.path.exists(img_dir):
+            os.makedirs(img_dir)
+        
+        # Listar imágenes en el directorio
+        images = os.listdir(img_dir)
+        
+        # Cargar productos para verificar
+        products = []
+        with open('products.csv', 'r', encoding='utf-8') as file:
+            csv_reader = csv.DictReader(file)
+            for row in csv_reader:
+                products.append(row)
+        
+        # Verificar qué imágenes faltan
+        missing_images = []
+        for product in products:
+            if 'imagen_url' in product:
+                img_name = product['imagen_url']
+                if img_name and img_name not in images:
+                    missing_images.append(img_name)
+        
+        result = {
+            "success": True,
+            "message": "Correcciones aplicadas",
+            "images_found": images,
+            "missing_images": missing_images,
+            "products": len(products)
+        }
+        
+        return result
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+@app.route('/generar_ai_content', methods=['POST'])
+def generar_ai_content():
+    """Ruta para generar contenido con IA a partir de una imagen y descripción"""
+    try:
+        # Obtener la descripción del formulario
+        descripcion = request.form.get('details', '')
+        
+        # Manejar la imagen
+        imagen_temp = None
+        if 'photo' in request.files and request.files['photo'].filename:
+            # Si se subió un archivo
+            imagen = request.files['photo']
+            imagen_temp = os.path.join('temp', f"{uuid.uuid4()}.jpg")
+            os.makedirs('temp', exist_ok=True)  # Asegurarse de que exista el directorio
+            imagen.save(imagen_temp)
+        elif 'camera_image' in request.form and request.form['camera_image']:
+            # Si se capturó una imagen con la cámara (base64)
+            b64_imagen = request.form['camera_image'].split(',')[1] if ',' in request.form['camera_image'] else request.form['camera_image']
+            imagen_bytes = base64.b64decode(b64_imagen)
+            
+            # Guardar temporalmente la imagen
+            imagen_temp = os.path.join('temp', f"{uuid.uuid4()}.jpg")
+            os.makedirs('temp', exist_ok=True)
+            
+            # Convertir y guardar la imagen
+            img = Image.open(io.BytesIO(imagen_bytes))
+            img.save(imagen_temp)
+        
+        # Generar contenido con IA
+        categorias = "No se pudo generar"
+        descripcion_larga = "No se pudo generar una descripción detallada."
+        titulo = "Material Reciclable"
+        
+        if imagen_temp:
+            # Usar la IA para generar el contenido
+            categorias = generar_categorias(descripcion, imagen_temp)
+            descripcion_larga = generar_descripcion_larga(descripcion, imagen_temp)
+            titulo = generar_titulo(descripcion, imagen_temp)
+            
+            # Eliminar la imagen temporal
+            if os.path.exists(imagen_temp):
+                os.remove(imagen_temp)
+        else:
+            # Si no hay imagen, intentar solo con la descripción
+            categorias = generar_categorias(descripcion)
+            descripcion_larga = generar_descripcion_larga(descripcion)
+            titulo = generar_titulo(descripcion)
+        
+        # Devolver los resultados como JSON
+        return jsonify({
+            'titulo': titulo,
+            'categorias': categorias,
+            'descripcion_larga': descripcion_larga
+        })
+        
+    except Exception as e:
+        # Registrar el error y devolver un mensaje amigable
+        app.logger.error(f"Error en generar_ai_content: {str(e)}")
+        return jsonify({'error': f"Ocurrió un error: {str(e)}"}), 500
+
+@app.route('/test-ai')
+def test_ai():
+    try:
+        # Probar la generación de categorías con un texto estático
+        categorias = generar_categorias("Madera de pino en buen estado")
+        descripcion = generar_descripcion_larga("Madera de pino en buen estado")
+        titulo = generar_titulo("Madera de pino en buen estado")
+        
+        return jsonify({
+            'success': True,
+            'titulo': titulo,
+            'categorias': categorias,
+            'descripcion': descripcion
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        })
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True) 

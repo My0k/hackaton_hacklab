@@ -283,6 +283,83 @@
                 border-radius: 0 0 8px 8px;
             }
         }
+        
+        .ai-info-box {
+            display: flex;
+            align-items: center;
+            background-color: rgba(59, 157, 213, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .ai-info-box i {
+            font-size: 1.5rem;
+            color: var(--azul-planeta);
+            margin-right: 15px;
+        }
+        
+        .ai-info-box p {
+            color: #555;
+            margin: 0;
+            font-size: 0.9rem;
+        }
+        
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+        }
+        
+        .checkbox-container input[type="checkbox"] {
+            margin-right: 10px;
+        }
+        
+        .preview-section {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            background-color: #f9f9f9;
+        }
+        
+        .preview-section h3 {
+            color: var(--verde-bosque);
+            margin-top: 0;
+        }
+        
+        .preview-categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .preview-category {
+            background-color: var(--verde-hoja);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .loading-animation {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .loading-animation i {
+            font-size: 1.5rem;
+            color: var(--azul-planeta);
+            animation: spin 2s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -365,11 +442,48 @@
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label" for="details">Detalles del Material</label>
-                    <textarea class="form-textarea" id="details" name="details" placeholder="Describe brevemente el material u objeto que quieres compartir..."></textarea>
+                    <label class="form-label" for="details">Descripción del Material</label>
+                    <textarea class="form-textarea" id="details" name="details" placeholder="Describe brevemente el material u objeto que quieres compartir..." required></textarea>
                 </div>
                 
-                <button type="submit" class="form-submit">Crear Revamp</button>
+                <!-- Campo oculto para el costo de envío predeterminado -->
+                <input type="hidden" name="shipping_cost" value="1000">
+                
+                <div class="form-group">
+                    <div class="ai-info-box">
+                        <i class="fas fa-robot"></i>
+                        <p>Usaremos inteligencia artificial para generar el título, categorías y una descripción detallada para tu Revamp automáticamente.</p>
+                    </div>
+                </div>
+                
+                <button type="button" class="form-submit" id="generateButton">
+                    <i class="fas fa-robot"></i> Generar Contenido con IA
+                </button>
+                
+                <div class="preview-section" id="previewContainer" style="display: none;">
+                    <h3>Título Generado</h3>
+                    <div class="preview-title"></div>
+                    
+                    <h3>Categorías Generadas</h3>
+                    <div class="preview-categories"></div>
+                    
+                    <h3>Descripción Detallada</h3>
+                    <div class="preview-description"></div>
+                    
+                    <div style="margin-top: 20px; display: flex; gap: 10px;">
+                        <button type="button" class="camera-button" id="accept-ai-btn">
+                            <i class="fas fa-check"></i> Aceptar y Publicar
+                        </button>
+                        <button type="button" class="camera-button secondary" id="regenerate-ai-btn">
+                            <i class="fas fa-sync-alt"></i> Regenerar
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Campos ocultos para almacenar los datos generados -->
+                <input type="hidden" id="generatedTitle" name="title">
+                <input type="hidden" id="generatedCategories" name="categorias">
+                <input type="hidden" id="generatedDescription" name="descripcion_larga">
             </form>
         </div>
     </section>
@@ -425,7 +539,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Elementos del DOM
+            // Elementos del DOM para la cámara y subida de fotos
             const photoUploadContainer = document.getElementById('photoUploadContainer');
             const photoInput = document.getElementById('photoInput');
             const photoPreview = document.getElementById('photoPreview');
@@ -437,6 +551,13 @@
             const switchCameraBtn = document.getElementById('switch-camera-btn');
             const cancelCameraBtn = document.getElementById('cancel-camera-btn');
             const cameraImageData = document.getElementById('camera-image-data');
+            const form = document.querySelector('.crear-form');
+            const detailsField = document.getElementById('details');
+            const generateButton = document.getElementById('generateButton');
+            const previewContainer = document.getElementById('previewContainer');
+            const generatedTitleInput = document.getElementById('generatedTitle');
+            const generatedCategoriesInput = document.getElementById('generatedCategories');
+            const generatedDescriptionInput = document.getElementById('generatedDescription');
             
             // Variables para la cámara
             let stream = null;
@@ -650,6 +771,144 @@
                     
                     reader.readAsDataURL(e.dataTransfer.files[0]);
                 }
+            });
+            
+            // Manejo del botón de generación
+            generateButton.addEventListener('click', async function() {
+                // Validar campos requeridos
+                if (!detailsField.value.trim()) {
+                    alert('Por favor, ingresa una descripción para tu material.');
+                    detailsField.focus();
+                    return;
+                }
+                
+                // Verificar si hay una foto
+                const hasPhoto = photoInput.files && photoInput.files[0] || cameraImageData.value;
+                if (!hasPhoto) {
+                    alert('Por favor, sube o toma una foto de tu material.');
+                    return;
+                }
+                
+                // Mostrar indicador de carga
+                generateButton.disabled = true;
+                generateButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando...';
+                
+                try {
+                    // Crear FormData con los campos necesarios
+                    const formData = new FormData();
+                    formData.append('details', detailsField.value);
+                    
+                    // Agregar la foto, ya sea del input file o de la cámara
+                    if (photoInput.files && photoInput.files[0]) {
+                        formData.append('photo', photoInput.files[0]);
+                    } else if (cameraImageData.value) {
+                        formData.append('camera_image', cameraImageData.value);
+                    }
+                    
+                    // Enviar la solicitud al servidor para generar categorías y descripción
+                    const response = await fetch('/generar_ai_content', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Error al comunicarse con el servidor');
+                    }
+                    
+                    const data = await response.json();
+                    
+                    // Verificar si hay errores
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+                    
+                    // Guardar los datos generados en los inputs ocultos
+                    generatedTitleInput.value = data.titulo || "Material reciclable";
+                    generatedCategoriesInput.value = data.categorias;
+                    generatedDescriptionInput.value = data.descripcion_larga;
+                    
+                    // Mostrar los resultados en la previsualización
+                    const titleContainer = previewContainer.querySelector('.preview-title');
+                    const categoriesContainer = previewContainer.querySelector('.preview-categories');
+                    const descriptionContainer = previewContainer.querySelector('.preview-description');
+                    
+                    // Limpiar contenedores
+                    titleContainer.textContent = "";
+                    categoriesContainer.innerHTML = '';
+                    descriptionContainer.innerHTML = '';
+                    
+                    // Mostrar título
+                    titleContainer.textContent = data.titulo || "Material reciclable";
+                    
+                    // Mostrar categorías
+                    const categoryList = data.categorias.split(',').map(cat => cat.trim());
+                    categoryList.forEach(category => {
+                        if (category) {
+                            const span = document.createElement('span');
+                            span.className = 'preview-category';
+                            span.textContent = category;
+                            categoriesContainer.appendChild(span);
+                        }
+                    });
+                    
+                    // Mostrar descripción
+                    descriptionContainer.textContent = data.descripcion_larga;
+                    
+                    // Mostrar la sección de previsualización
+                    previewContainer.style.display = 'block';
+                    
+                    // Ocultar el botón de generación
+                    generateButton.style.display = 'none';
+                    
+                    // Scroll hasta la previsualización
+                    previewContainer.scrollIntoView({ behavior: 'smooth' });
+                    
+                } catch (error) {
+                    console.error('Error:', error);
+                    
+                    // Crear un mensaje de error más detallado
+                    let errorMsg = 'Ocurrió un error al generar el contenido. ';
+                    
+                    if (error.message.includes('comunicarse con el servidor')) {
+                        errorMsg += 'No se pudo establecer conexión con el servidor. Por favor, verifica tu conexión a internet y vuelve a intentarlo.';
+                    } else {
+                        errorMsg += error.message;
+                    }
+                    
+                    // Mostrar el error
+                    const errorElement = document.createElement('div');
+                    errorElement.className = 'error-message';
+                    errorElement.textContent = errorMsg;
+                    
+                    // Insertar antes del formulario
+                    form.parentNode.insertBefore(errorElement, form);
+                    
+                    // Scroll al mensaje de error
+                    errorElement.scrollIntoView({ behavior: 'smooth' });
+                    
+                    // Eliminar el mensaje después de 8 segundos
+                    setTimeout(() => {
+                        errorElement.remove();
+                    }, 8000);
+                }
+            });
+            
+            // Botón para aceptar la generación de IA
+            document.getElementById('accept-ai-btn').addEventListener('click', function() {
+                // Enviar el formulario con los datos generados ya incluidos
+                form.submit();
+            });
+            
+            // Botón para regenerar el contenido
+            document.getElementById('regenerate-ai-btn').addEventListener('click', function() {
+                // Ocultar la previsualización
+                previewContainer.style.display = 'none';
+                
+                // Mostrar el botón de generación
+                generateButton.style.display = 'block';
+                
+                // Simular clic en el botón de generación
+                generateButton.click();
             });
         });
     </script>

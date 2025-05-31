@@ -1,9 +1,10 @@
 sku,titulo,descripcion,descripcion_larga,costo_transporte,descartador,imagen_url,categorias
-001,5 fardos de ropa vieja,Se descarta retiro en zona sur,3000,Juan,fardo.png,textil|ropa|reutilizable
-003,Lote de maderas usadas,Incluye tablones y restos de muebles,2000,Carlos,madera.png,madera|mueble|reutilizable
-004,Bicicleta sin ruedas,Estructura sólida para reconstrucción,1500,Andrea,bici.png,metal|transporte|reparable
-005,Computador antiguo,No enciende pero tiene componentes aprovechables,2500,Ignacio,computador.png,electrónico|reutilizable|reciclable
-006,Ventanas de aluminio usadas,De casa en demolición,3000,Sofía,ventana de aluminio.png,metal|construcción|reutilizable
-007,Tv plasma con pantalla trizada,Se puede rescatar electrónica interna,4000,Rodrigo,tv.png,electrónico|reparable|reciclable
-008,Sillas de comedor rotas,Para restaurar o usar partes,1000,Lucía,silla.png,madera|mueble|reparable
-009,Lavadora sin motor,Carcasa y tambor en buen estado,3500,Tomás,lavadora.png,electrodoméstico|metal|reutilizable
+1,5 fardos de ropa vieja,Se descarta retiro en zona sur,3000,,Juan,/static/fotos/fardo.png,textil|ropa|reutilizable
+3,Lote de maderas usadas,Incluye tablones y restos de muebles,2000,,Carlos,/static/fotos/madera.png,madera|mueble|reutilizable
+4,Bicicleta sin ruedas,Estructura sólida para reconstrucción,1500,,Andrea,/static/fotos/bici.png,metal|transporte|reparable
+5,Computador antiguo,No enciende pero tiene componentes aprovechables,2500,,Ignacio,/static/fotos/computador.png,electrónico|reutilizable|reciclable
+6,Ventanas de aluminio usadas,De casa en demolición,3000,,Sofía,/static/fotos/ventana de aluminio.png,metal|construcción|reutilizable
+7,Tv plasma con pantalla trizada,Se puede rescatar electrónica interna,4000,,Rodrigo,/static/fotos/tv.png,electrónico|reparable|reciclable
+8,Sillas de comedor rotas,Para restaurar o usar partes,1000,,Lucía,/static/fotos/silla.png,madera|mueble|reparable
+9,Lavadora sin motor,Carcasa y tambor en buen estado,3500,,Tomás,/static/fotos/lavadora.png,electrodoméstico|metal|reutilizable
+010,casa,casa,,2000,Revamper,0713a34d5c7140789fc12599ca1d9bba_D_NQ_NP_2X_631692-MLC77810981708_072024-F.jpg,

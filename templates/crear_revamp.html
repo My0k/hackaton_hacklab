@@ -176,6 +176,16 @@
         .highlight-link:hover {
             color: var(--naranja-sol) !important;
         }
+
+        .error-message {
+            background-color: var(--rojo-coral);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
@@ -209,6 +219,12 @@
             {% if mensaje %}
             <div class="success-message">
                 {{ mensaje }}
+            </div>
+            {% endif %}
+            
+            {% if error %}
+            <div class="error-message">
+                {{ error }}
             </div>
             {% endif %}
             

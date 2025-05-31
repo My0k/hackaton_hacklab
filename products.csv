@@ -1,4 +1,4 @@
-sku,titulo,descripcion,costo_transporte,descartador,imagen_url,categorias
+sku,titulo,descripcion,descripcion_larga,costo_transporte,descartador,imagen_url,categorias
 001,5 fardos de ropa vieja,Se descarta retiro en zona sur,3000,Juan,fardo.png,textil|ropa|reutilizable
 003,Lote de maderas usadas,Incluye tablones y restos de muebles,2000,Carlos,madera.png,madera|mueble|reutilizable
 004,Bicicleta sin ruedas,Estructura sólida para reconstrucción,1500,Andrea,bici.png,metal|transporte|reparable

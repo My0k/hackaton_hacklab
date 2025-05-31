@@ -1,8 +1,15 @@
 from flask import Flask, render_template, send_from_directory, request, url_for
 import os
 import csv
+import uuid
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
+
+UPLOAD_FOLDER = 'static/fotos'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 def load_products():
     products = []
@@ -327,11 +334,99 @@ def materiales_disponibles(material=None, categoria=None):
 @app.route('/crear-revamp', methods=['GET', 'POST'])
 def crear_revamp():
     if request.method == 'POST':
-        # Aquí iría la lógica para procesar la foto y los detalles enviados
-        # Por ahora, simplemente redirigimos de vuelta a la misma página
-        return render_template('crear_revamp.html', mensaje="¡Tu Revamp ha sido creado exitosamente!")
+        # Verificar si hay un archivo en la solicitud
+        if 'photo' not in request.files:
+            return render_template('crear_revamp.html', error="No se seleccionó ninguna imagen")
+        
+        file = request.files['photo']
+        details = request.form.get('details', '')
+        
+        # Si el usuario no selecciona un archivo
+        if file.filename == '':
+            return render_template('crear_revamp.html', error="No se seleccionó ninguna imagen")
+        
+        if file and allowed_file(file.filename):
+            # Generar un nombre de archivo seguro y único
+            filename = secure_filename(file.filename)
+            # Añadir un identificador único para evitar sobreescrituras
+            unique_filename = f"{uuid.uuid4().hex}_{filename}"
+            
+            # Asegurarse de que el directorio existe
+            os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+            
+            # Guardar el archivo
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+            file.save(file_path)
+            
+            # Obtener el siguiente SKU
+            next_sku = get_next_sku()
+            
+            # Preparar nueva fila para el CSV
+            new_product = {
+                'sku': next_sku,
+                'titulo': details[:30],  # Limitar título a 30 caracteres
+                'descripcion': details,
+                'descripcion_larga': '',
+                'costo_transporte': '2000',  # Valor por defecto
+                'descartador': 'Revamper',
+                'imagen_url': unique_filename,
+                'categorias': ''
+            }
+            
+            # Añadir al CSV
+            try:
+                # Verificar si el archivo existe y obtener los encabezados
+                file_exists = os.path.isfile('products.csv')
+                
+                with open('products.csv', 'a', newline='', encoding='utf-8') as file:
+                    fieldnames = ['sku', 'titulo', 'descripcion', 'descripcion_larga', 
+                                  'costo_transporte', 'descartador', 'imagen_url', 'categorias']
+                    writer = csv.DictWriter(file, fieldnames=fieldnames)
+                    
+                    # Escribir encabezados solo si el archivo es nuevo
+                    if not file_exists:
+                        writer.writeheader()
+                    
+                    writer.writerow(new_product)
+                
+                return render_template('crear_revamp.html', 
+                                      mensaje=f"¡Tu Revamp ha sido creado exitosamente! Producto #{next_sku}")
+            
+            except Exception as e:
+                print(f"Error saving to CSV: {e}")
+                return render_template('crear_revamp.html', 
+                                      error=f"Error al guardar el producto: {str(e)}")
+        else:
+            return render_template('crear_revamp.html', 
+                                  error="Formato de archivo no permitido. Use PNG, JPG, JPEG o GIF")
     
     return render_template('crear_revamp.html')
+
+# Función para verificar extensiones permitidas
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+# Función para obtener el próximo SKU
+def get_next_sku():
+    try:
+        with open('products.csv', 'r', encoding='utf-8') as file:
+            csv_reader = csv.DictReader(file)
+            max_sku = 0
+            for row in csv_reader:
+                try:
+                    sku_num = int(row['sku'])
+                    if sku_num > max_sku:
+                        max_sku = sku_num
+                except (ValueError, KeyError):
+                    continue
+            
+            # Formatear el siguiente SKU como string de 3 dígitos
+            next_sku = str(max_sku + 1).zfill(3)
+            return next_sku
+    except Exception as e:
+        print(f"Error getting next SKU: {e}")
+        return "001"  # Valor por defecto si hay error
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True) 

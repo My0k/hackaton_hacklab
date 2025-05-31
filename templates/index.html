@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revamp.cl - Hazle upcycling a tus cachureos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <style>
+        :root {
+            --verde-hoja: #A5D65C;
+            --rojo-coral: #F95F62;
+            --azul-planeta: #3B9DD5;
+            --gris-reciclaje: #79C5BE;
+            --naranja-sol: #F9A825;
+            --verde-bosque: #6CB34E;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f9f9f9;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+        }
+        
+        .logo {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 1.8rem;
+            color: var(--verde-bosque);
+        }
+        
+        .logo span {
+            color: var(--naranja-sol);
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: var(--azul-planeta);
+        }
+        
+        .cta-button {
+            background-color: var(--rojo-coral);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .cta-button:hover {
+            background-color: #e54b4e;
+            transform: translateY(-2px);
+        }
+        
+        .hero {
+            padding: 80px 0;
+            background: linear-gradient(135deg, rgba(165, 214, 92, 0.1), rgba(108, 179, 78, 0.2));
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: var(--naranja-sol);
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 40px;
+            color: #555;
+        }
+        
+        .features {
+            padding: 80px 0;
+            background-color: white;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.2rem;
+            margin-bottom: 60px;
+            color: var(--verde-bosque);
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+        
+        .feature-card {
+            text-align: center;
+            padding: 30px;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--gris-reciclaje);
+        }
+        
+        .feature-card h3 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--azul-planeta);
+        }
+        
+        .how-it-works {
+            padding: 80px 0;
+            background-color: #f9f9f9;
+        }
+        
+        .steps {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+        }
+        
+        .step {
+            flex: 1;
+            min-width: 250px;
+            max-width: 350px;
+            position: relative;
+            padding: 20px;
+        }
+        
+        .step-number {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 40px;
+            height: 40px;
+            background-color: var(--naranja-sol);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .step-content {
+            margin-left: 25px;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border-left: 4px solid var(--verde-hoja);
+        }
+        
+        .step h3 {
+            color: var(--verde-bosque);
+            margin-bottom: 10px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .partners {
+            padding: 80px 0;
+            background-color: white;
+        }
+        
+        .partners-logos {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 40px;
+            margin-top: 40px;
+        }
+        
+        .partner-logo {
+            background-color: #f5f5f5;
+            width: 150px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-weight: bold;
+            color: #888;
+        }
+        
+        .cta-section {
+            padding: 100px 0;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(59, 157, 213, 0.1), rgba(121, 197, 190, 0.2));
+        }
+        
+        .cta-section h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            color: var(--naranja-sol);
+        }
+        
+        footer {
+            background-color: #333;
+            color: white;
+            padding: 60px 0 20px;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .footer-column h3 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: var(--verde-hoja);
+        }
+        
+        .footer-column ul {
+            list-style: none;
+        }
+        
+        .footer-column ul li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-column a {
+            color: #ddd;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-column a:hover {
+            color: var(--verde-hoja);
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .social-links a {
+            color: white;
+            background-color: rgba(255,255,255,0.1);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .social-links a:hover {
+            background-color: var(--azul-planeta);
+            transform: translateY(-3px);
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.9rem;
+            color: #999;
+        }
+        
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+                font-size: 1.5rem;
+                cursor: pointer;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">Revamp<span>.cl</span></div>
+                <div class="nav-links">
+                    <a href="/" class="active">Inicio</a>
+                    <a href="#">Cómo Funciona</a>
+                    <a href="/marketplace">Marketplace</a>
+                    <a href="#">Empresas</a>
+                    <a href="#">Contacto</a>
+                </div>
+                <button class="cta-button">¡Comienza Ya!</button>
+            </nav>
+        </div>
+    </header>
+    
+    <section class="hero">
+        <div class="container">
+            <h1>Hazle upcycling a tus cachureos</h1>
+            <p>Conectamos tus objetos en desuso con empresas y transportistas que les darán una segunda vida, contribuyendo a un mundo más sostenible.</p>
+            <button class="cta-button">Descubre Cómo</button>
+            <a href="/marketplace" class="cta-button" style="display: inline-block; margin-left: 15px; background-color: var(--verde-bosque);">Visitar Marketplace</a>
+        </div>
+    </section>
+    
+    <section class="features">
+        <div class="container">
+            <h2 class="section-title">¿Por qué elegir Revamp?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-recycle" style="color: var(--verde-hoja);"></i>
+                    </div>
+                    <h3>Impacto Ambiental</h3>
+                    <p>Reduce la huella ecológica y contribuye a disminuir los residuos que terminan en vertederos.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-truck" style="color: var(--azul-planeta);"></i>
+                    </div>
+                    <h3>Recogida a Domicilio</h3>
+                    <p>Nuestros transportistas asociados recogen tus objetos directamente desde tu hogar.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-store" style="color: var(--rojo-coral);"></i>
+                    </div>
+                    <h3>Red de Empresas</h3>
+                    <p>Colaboramos con empresas comprometidas con la economía circular y el upcycling.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="how-it-works">
+        <div class="container">
+            <h2 class="section-title">¿Cómo Funciona?</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Registra tus Objetos</h3>
+                        <p>Sube fotos y detalles de los objetos que ya no utilizas pero que podrían tener una segunda vida.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Conectamos Contigo</h3>
+                        <p>Las empresas interesadas en tus objetos para upcycling te contactarán a través de nuestra plataforma.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Recogida y Transformación</h3>
+                        <p>Organizamos la recogida con transportistas asociados y tu objeto obtiene una nueva vida.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="partners">
+        <div class="container">
+            <h2 class="section-title">Empresas Asociadas</h2>
+            <div class="partners-logos">
+                <div class="partner-logo">Empresa 1</div>
+                <div class="partner-logo">Empresa 2</div>
+                <div class="partner-logo">Empresa 3</div>
+                <div class="partner-logo">Empresa 4</div>
+                <div class="partner-logo">Empresa 5</div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="cta-section">
+        <div class="container">
+            <h2>¿Listo para darle una segunda vida a tus cachureos?</h2>
+            <p>Únete a la comunidad de Revamp y forma parte del cambio hacia un consumo más responsable.</p>
+            <button class="cta-button">Regístrate Gratis</button>
+            <a href="/marketplace" class="cta-button" style="display: inline-block; margin-left: 15px; background-color: var(--verde-bosque);">Explora el Marketplace</a>
+        </div>
+    </section>
+    
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>Revamp.cl</h3>
+                    <p>Transformando el concepto de residuo en recurso, un objeto a la vez.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>Enlaces</h3>
+                    <ul>
+                        <li><a href="/">Inicio</a></li>
+                        <li><a href="#">Sobre Nosotros</a></li>
+                        <li><a href="#">Cómo Funciona</a></li>
+                        <li><a href="/marketplace">Marketplace</a></li>
+                        <li><a href="#">Contacto</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Servicios</h3>
+                    <ul>
+                        <li><a href="#">Para Usuarios</a></li>
+                        <li><a href="#">Para Empresas</a></li>
+                        <li><a href="#">Para Transportistas</a></li>
+                        <li><a href="#">Colaboraciones</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Contacto</h3>
+                    <ul>
+                        <li>info@revamp.cl</li>
+                        <li>+56 9 1234 5678</li>
+                        <li>Santiago, Chile</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 Revamp.cl - Todos los derechos reservados</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

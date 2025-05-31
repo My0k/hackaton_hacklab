@@ -1,11 +1,9 @@
 sku,titulo,descripcion,costo_transporte,descartador,imagen_url,categorias
-001,5 fardos de ropa vieja,Se descarta retiro en zona sur,3000,Juan,https://http2.mlstatic.com/D_NQ_NP_852546-MLC85417790629_052025-O.jpg,textil|ropa|reutilizable
-002,Refrigerador sin funcionar,Ideal para repuestos o reparación,5000,María,https://http2.mlstatic.com/D_NQ_NP_852546-MLC85417790629_052025-O.jpg,electrodoméstico|metal|reparable
-003,Lote de maderas usadas,Incluye tablones y restos de muebles,2000,Carlos,https://http2.mlstatic.com/D_NQ_NP_852546-MLC85417790629_052025-O.jpg,madera|mueble|reutilizable
-004,Bicicleta sin ruedas,Estructura sólida para reconstrucción,1500,Andrea,https://http2.mlstatic.com/D_NQ_NP_852546-MLC85417790629_052025-O.jpg,metal|transporte|reparable
-005,Computador antiguo,No enciende pero tiene componentes aprovechables,2500,Ignacio,https://http2.mlstatic.com/D_NQ_NP_852546-MLC85417790629_052025-O.jpg,electrónico|reutilizable|reciclable
-006,Ventanas de aluminio usadas,De casa en demolición,3000,Sofía,https://http2.mlstatic.com/D_NQ_NP_852546-MLC85417790629_052025-O.jpg,metal|construcción|reutilizable
-007,Tv plasma con pantalla trizada,Se puede rescatar electrónica interna,4000,Rodrigo,https://http2.mlstatic.com/D_NQ_NP_852546-MLC85417790629_052025-O.jpg,electrónico|reparable|reciclable
-008,Sillas de comedor rotas,Para restaurar o usar partes,1000,Lucía,https://http2.mlstatic.com/D_NQ_NP_852546-MLC85417790629_052025-O.jpg,madera|mueble|reparable
-009,Lavadora sin motor,Carcasa y tambor en buen estado,3500,Tomás,https://http2.mlstatic.com/D_NQ_NP_852546-MLC85417790629_052025-O.jpg,electrodoméstico|metal|reutilizable
-010,Colchón de 2 plazas usado,Manchas visibles, ideal para reciclar relleno,1000,Valentina,https://http2.mlstatic.com/D_NQ_NP_852546-MLC85417790629_052025-O.jpg,mueble|textil|reciclable
+001,5 fardos de ropa vieja,Se descarta retiro en zona sur,3000,Juan,fardo.png,textil|ropa|reutilizable
+003,Lote de maderas usadas,Incluye tablones y restos de muebles,2000,Carlos,madera.png,madera|mueble|reutilizable
+004,Bicicleta sin ruedas,Estructura sólida para reconstrucción,1500,Andrea,bici.png,metal|transporte|reparable
+005,Computador antiguo,No enciende pero tiene componentes aprovechables,2500,Ignacio,computador.png,electrónico|reutilizable|reciclable
+006,Ventanas de aluminio usadas,De casa en demolición,3000,Sofía,ventana de aluminio.png,metal|construcción|reutilizable
+007,Tv plasma con pantalla trizada,Se puede rescatar electrónica interna,4000,Rodrigo,tv.png,electrónico|reparable|reciclable
+008,Sillas de comedor rotas,Para restaurar o usar partes,1000,Lucía,silla.png,madera|mueble|reparable
+009,Lavadora sin motor,Carcasa y tambor en buen estado,3500,Tomás,lavadora.png,electrodoméstico|metal|reutilizable

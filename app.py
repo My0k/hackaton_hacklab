@@ -1,4 +1,4 @@
-from flask import Flask, render_template, send_from_directory, request
+from flask import Flask, render_template, send_from_directory, request, url_for
 import os
 import csv
 
@@ -10,9 +10,10 @@ def load_products():
         with open('products.csv', 'r', encoding='utf-8') as file:
             csv_reader = csv.DictReader(file)
             for row in csv_reader:
-                # Convertir las categorías a una lista
-                if 'categorias' in row:
-                    row['categorias_lista'] = [cat.strip() for cat in row['categorias'].split('|')] if row['categorias'] else []
+                # Añadir la ruta completa a las imágenes
+                row['imagen_url'] = url_for('static', filename=f'fotos/{row["imagen_url"]}')
+                # Convertir categorías de string a lista
+                row['categorias_lista'] = row['categorias'].split('|')
                 products.append(row)
         return products
     except Exception as e:

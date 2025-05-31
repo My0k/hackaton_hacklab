@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Materiales - Revamp.cl</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <style>
+        .materials-header {
+            background: linear-gradient(135deg, rgba(121, 197, 190, 0.2), rgba(59, 157, 213, 0.3));
+            padding: 60px 0;
+            text-align: center;
+        }
+        
+        .materials-title {
+            color: var(--verde-bosque);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+        
+        .materials-description {
+            max-width: 800px;
+            margin: 0 auto 30px;
+            color: #555;
+            font-size: 1.1rem;
+        }
+        
+        .materials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 30px;
+            padding: 50px 0;
+        }
+        
+        .material-card {
+            background-color: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .material-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+        }
+        
+        .material-icon {
+            height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: white;
+        }
+        
+        .material-icon.textiles {
+            background: linear-gradient(to right, var(--naranja-sol), #FBC02D);
+        }
+        
+        .material-icon.madera {
+            background: linear-gradient(to right, #8D6E63, #6D4C41);
+        }
+        
+        .material-icon.chatarra {
+            background: linear-gradient(to right, #78909C, #546E7A);
+        }
+        
+        .material-icon.plastico {
+            background: linear-gradient(to right, var(--azul-planeta), #1E88E5);
+        }
+        
+        .material-icon.reparables {
+            background: linear-gradient(to right, var(--rojo-coral), #E53935);
+        }
+        
+        .material-content {
+            padding: 25px;
+        }
+        
+        .material-name {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .material-name i {
+            margin-right: 12px;
+            color: var(--verde-bosque);
+        }
+        
+        .material-description {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .material-examples {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .material-examples h4 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--verde-bosque);
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+        
+        .examples-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .example-tag {
+            background-color: #e0e0e0;
+            padding: 5px 12px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            color: #555;
+        }
+        
+        .view-products {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 8px 20px;
+            background-color: var(--verde-hoja);
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .view-products:hover {
+            background-color: var(--verde-bosque);
+            transform: translateY(-2px);
+        }
+        
+        .cta-materials {
+            padding: 70px 0;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(165, 214, 92, 0.1), rgba(108, 179, 78, 0.2));
+        }
+        
+        .cta-materials h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+            color: var(--naranja-sol);
+        }
+        
+        .cta-materials p {
+            max-width: 700px;
+            margin: 0 auto 30px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">Revamp<span>.cl</span></div>
+                <div class="nav-links">
+                    <a href="/">Inicio</a>
+                    <a href="#">Cómo Funciona</a>
+                    <a href="/marketplace">Marketplace</a>
+                    <a href="/materiales" class="active">Materiales</a>
+                    <a href="#">Contacto</a>
+                </div>
+                <button class="cta-button">¡Publicar Material!</button>
+            </nav>
+        </div>
+    </header>
+    
+    <section class="materials-header">
+        <div class="container">
+            <h1 class="materials-title">Materiales que Reutilizamos</h1>
+            <p class="materials-description">En Revamp nos dedicamos a darle una segunda vida a diversos materiales que de otra forma terminarían en vertederos. Conoce qué tipo de materiales aceptamos y cómo los transformamos.</p>
+        </div>
+    </section>
+    
+    <section class="container">
+        <div class="materials-grid">
+            <div class="material-card">
+                <div class="material-icon textiles">
+                    <i class="fas fa-tshirt"></i>
+                </div>
+                <div class="material-content">
+                    <h3 class="material-name">
+                        <i class="fas fa-leaf"></i>
+                        Textiles
+                    </h3>
+                    <p class="material-description">
+                        Los textiles son uno de los materiales más desperdiciados a nivel mundial. En Revamp les damos una segunda oportunidad, transformándolos en nuevos productos o facilitando su reutilización por diseñadores y artesanos.
+                    </p>
+                    <div class="material-examples">
+                        <h4>Aceptamos:</h4>
+                        <div class="examples-list">
+                            <span class="example-tag">Ropa vieja</span>
+                            <span class="example-tag">Lana</span>
+                            <span class="example-tag">Género</span>
+                            <span class="example-tag">Cortinas</span>
+                            <span class="example-tag">Toallas</span>
+                            <span class="example-tag">Sábanas</span>
+                        </div>
+                    </div>
+                    <a href="{{ url_for('marketplace', categoria='textil') }}" class="view-products">Ver productos textiles</a>
+                </div>
+            </div>
+            
+            <div class="material-card">
+                <div class="material-icon madera">
+                    <i class="fas fa-tree"></i>
+                </div>
+                <div class="material-content">
+                    <h3 class="material-name">
+                        <i class="fas fa-leaf"></i>
+                        Madera
+                    </h3>
+                    <p class="material-description">
+                        La madera es un recurso valioso que puede tener múltiples vidas. Rescatamos piezas de muebles, sobrantes de construcción y otros elementos para convertirlos en nuevos productos útiles y decorativos.
+                    </p>
+                    <div class="material-examples">
+                        <h4>Aceptamos:</h4>
+                        <div class="examples-list">
+                            <span class="example-tag">Muebles</span>
+                            <span class="example-tag">Tablones</span>
+                            <span class="example-tag">Pallets</span>
+                            <span class="example-tag">Puertas</span>
+                            <span class="example-tag">Marcos</span>
+                            <span class="example-tag">Materiales de construcción</span>
+                        </div>
+                    </div>
+                    <a href="{{ url_for('marketplace', categoria='madera') }}" class="view-products">Ver productos de madera</a>
+                </div>
+            </div>
+            
+            <div class="material-card">
+                <div class="material-icon chatarra">
+                    <i class="fas fa-cogs"></i>
+                </div>
+                <div class="material-content">
+                    <h3 class="material-name">
+                        <i class="fas fa-leaf"></i>
+                        Chatarra
+                    </h3>
+                    <p class="material-description">
+                        Los metales son altamente reciclables y pueden transformarse infinidad de veces. Recogemos diferentes tipos de chatarra para darles nueva vida o facilitar su correcto reciclaje por profesionales.
+                    </p>
+                    <div class="material-examples">
+                        <h4>Aceptamos:</h4>
+                        <div class="examples-list">
+                            <span class="example-tag">Vehículos</span>
+                            <span class="example-tag">Electrodomésticos</span>
+                            <span class="example-tag">Herramientas</span>
+                            <span class="example-tag">Tubería</span>
+                            <span class="example-tag">Materiales de construcción</span>
+                            <span class="example-tag">Bicicletas</span>
+                        </div>
+                    </div>
+                    <a href="{{ url_for('marketplace', categoria='metal') }}" class="view-products">Ver productos metálicos</a>
+                </div>
+            </div>
+            
+            <div class="material-card">
+                <div class="material-icon plastico">
+                    <i class="fas fa-wine-bottle"></i>
+                </div>
+                <div class="material-content">
+                    <h3 class="material-name">
+                        <i class="fas fa-leaf"></i>
+                        Plástico
+                    </h3>
+                    <p class="material-description">
+                        Aunque el plástico es uno de los principales contaminantes, muchos tipos pueden reciclarse o reutilizarse. Recogemos plásticos específicos para darles un nuevo propósito o asegurar su correcto procesamiento.
+                    </p>
+                    <div class="material-examples">
+                        <h4>Aceptamos:</h4>
+                        <div class="examples-list">
+                            <span class="example-tag">Botellas PET</span>
+                            <span class="example-tag">Envases PLA (biodegradables)</span>
+                            <span class="example-tag">Recipientes HDPE</span>
+                            <span class="example-tag">Juguetes</span>
+                            <span class="example-tag">Muebles de plástico</span>
+                        </div>
+                    </div>
+                    <a href="{{ url_for('marketplace', categoria='plástico') }}" class="view-products">Ver productos plásticos</a>
+                </div>
+            </div>
+            
+            <div class="material-card">
+                <div class="material-icon reparables">
+                    <i class="fas fa-tools"></i>
+                </div>
+                <div class="material-content">
+                    <h3 class="material-name">
+                        <i class="fas fa-leaf"></i>
+                        Reparables
+                    </h3>
+                    <p class="material-description">
+                        Muchos objetos solo necesitan una reparación para volver a ser útiles. Conectamos tus electrodomésticos, muebles y otros artículos con personas que tienen las habilidades para repararlos.
+                    </p>
+                    <div class="material-examples">
+                        <h4>Aceptamos:</h4>
+                        <div class="examples-list">
+                            <span class="example-tag">Electrodomésticos</span>
+                            <span class="example-tag">Computadores</span>
+                            <span class="example-tag">Teléfonos</span>
+                            <span class="example-tag">Bicicletas</span>
+                            <span class="example-tag">Muebles</span>
+                            <span class="example-tag">Herramientas</span>
+                        </div>
+                    </div>
+                    <a href="{{ url_for('marketplace', categoria='reparable') }}" class="view-products">Ver productos reparables</a>
+                </div>
+            </div>
+            
+            <div class="material-card">
+                <div class="material-icon" style="background: linear-gradient(to right, var(--verde-hoja), var(--verde-bosque));">
+                    <i class="fas fa-recycle"></i>
+                </div>
+                <div class="material-content">
+                    <h3 class="material-name">
+                        <i class="fas fa-leaf"></i>
+                        Otros Materiales
+                    </h3>
+                    <p class="material-description">
+                        Si tienes materiales que no encajan en las categorías anteriores pero crees que podrían ser reutilizados, ¡contáctanos! Estamos abiertos a explorar nuevas posibilidades para darle una segunda vida a tus objetos.
+                    </p>
+                    <div class="material-examples">
+                        <h4>También nos interesan:</h4>
+                        <div class="examples-list">
+                            <span class="example-tag">Vidrio</span>
+                            <span class="example-tag">Cartón</span>
+                            <span class="example-tag">Papel</span>
+                            <span class="example-tag">Equipos electrónicos</span>
+                            <span class="example-tag">Instrumentos musicales</span>
+                        </div>
+                    </div>
+                    <a href="{{ url_for('marketplace') }}" class="view-products">Ver todos los productos</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="cta-materials">
+        <div class="container">
+            <h2>¿Tienes materiales para darles una segunda vida?</h2>
+            <p>Súbelos a nuestro marketplace y conecta con personas o empresas interesadas en transformarlos.</p>
+            <button class="cta-button">Publicar un material</button>
+            <a href="/marketplace" class="cta-button" style="display: inline-block; margin-left: 15px; background-color: var(--verde-bosque);">Explorar el Marketplace</a>
+        </div>
+    </section>
+    
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>Revamp.cl</h3>
+                    <p>Transformando el concepto de residuo en recurso, un objeto a la vez.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>Enlaces</h3>
+                    <ul>
+                        <li><a href="/">Inicio</a></li>
+                        <li><a href="#">Sobre Nosotros</a></li>
+                        <li><a href="#">Cómo Funciona</a></li>
+                        <li><a href="/marketplace">Marketplace</a></li>
+                        <li><a href="/materiales">Materiales</a></li>
+                        <li><a href="#">Contacto</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Servicios</h3>
+                    <ul>
+                        <li><a href="#">Para Usuarios</a></li>
+                        <li><a href="#">Para Empresas</a></li>
+                        <li><a href="#">Para Transportistas</a></li>
+                        <li><a href="#">Colaboraciones</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Contacto</h3>
+                    <ul>
+                        <li>info@revamp.cl</li>
+                        <li>+56 9 1234 5678</li>
+                        <li>Santiago, Chile</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 Revamp.cl - Todos los derechos reservados</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

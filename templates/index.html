@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Revamp.cl - Hazle upcycling a tus cachureos</title>
+    <title>Revamp.cl - Hazle un Revamp a tus Desechos</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
@@ -103,15 +103,23 @@
         .hero h1 {
             font-family: 'Montserrat', sans-serif;
             font-size: 3rem;
+            color: var(--verde-bosque);
             margin-bottom: 20px;
-            color: var(--naranja-sol);
         }
         
         .hero p {
-            font-size: 1.2rem;
             max-width: 700px;
-            margin: 0 auto 40px;
+            margin: 0 auto 30px;
             color: #555;
+            font-size: 1.1rem;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.2rem;
+            color: var(--azul-planeta);
+            margin-bottom: 40px;
         }
         
         .features {
@@ -119,26 +127,17 @@
             background-color: white;
         }
         
-        .section-title {
-            text-align: center;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 2.2rem;
-            margin-bottom: 60px;
-            color: var(--verde-bosque);
-        }
-        
         .features-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 40px;
+            gap: 30px;
         }
         
         .feature-card {
             text-align: center;
             padding: 30px;
             border-radius: 10px;
-            background-color: #fff;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
             transition: transform 0.3s;
         }
         
@@ -147,16 +146,21 @@
         }
         
         .feature-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 2.5rem;
-            margin-bottom: 20px;
-            color: var(--gris-reciclaje);
+            background-color: rgba(59, 157, 213, 0.1);
+            border-radius: 50%;
         }
         
         .feature-card h3 {
             font-family: 'Montserrat', sans-serif;
-            font-size: 1.5rem;
-            margin-bottom: 15px;
             color: var(--azul-planeta);
+            margin-bottom: 15px;
         }
         
         .how-it-works {
@@ -165,49 +169,40 @@
         }
         
         .steps {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 30px;
+            max-width: 800px;
+            margin: 0 auto;
         }
         
         .step {
-            flex: 1;
-            min-width: 250px;
-            max-width: 350px;
+            display: flex;
+            margin-bottom: 50px;
             position: relative;
-            padding: 20px;
+        }
+        
+        .step:last-child {
+            margin-bottom: 0;
         }
         
         .step-number {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             background-color: var(--naranja-sol);
+            color: white;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-weight: bold;
             font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+            margin-right: 30px;
         }
         
-        .step-content {
-            margin-left: 25px;
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            border-left: 4px solid var(--verde-hoja);
-        }
-        
-        .step h3 {
+        .step-content h3 {
+            font-family: 'Montserrat', sans-serif;
             color: var(--verde-bosque);
             margin-bottom: 10px;
-            font-family: 'Montserrat', sans-serif;
         }
         
         .partners {
@@ -217,35 +212,40 @@
         
         .partners-logos {
             display: flex;
-            justify-content: center;
+            justify-content: space-around;
             flex-wrap: wrap;
-            gap: 40px;
-            margin-top: 40px;
+            gap: 30px;
         }
         
         .partner-logo {
-            background-color: #f5f5f5;
             width: 150px;
-            height: 80px;
+            height: 100px;
+            background-color: #f0f0f0;
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 8px;
-            font-weight: bold;
-            color: #888;
+            color: #777;
+            font-weight: 600;
         }
         
         .cta-section {
-            padding: 100px 0;
+            padding: 80px 0;
+            background: linear-gradient(135deg, rgba(121, 197, 190, 0.2), rgba(59, 157, 213, 0.3));
             text-align: center;
-            background: linear-gradient(135deg, rgba(59, 157, 213, 0.1), rgba(121, 197, 190, 0.2));
         }
         
         .cta-section h2 {
             font-family: 'Montserrat', sans-serif;
-            font-size: 2.5rem;
-            margin-bottom: 30px;
-            color: var(--naranja-sol);
+            font-size: 2.2rem;
+            color: var(--azul-planeta);
+            margin-bottom: 20px;
+        }
+        
+        .cta-section p {
+            max-width: 700px;
+            margin: 0 auto 30px;
+            color: #555;
         }
         
         footer {
@@ -263,9 +263,29 @@
         
         .footer-column h3 {
             font-family: 'Montserrat', sans-serif;
-            font-size: 1.2rem;
             margin-bottom: 20px;
             color: var(--verde-hoja);
+        }
+        
+        .footer-column p {
+            color: #aaa;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .social-links a {
+            color: white;
+            font-size: 1.2rem;
+            transition: color 0.3s;
+        }
+        
+        .social-links a:hover {
+            color: var(--rojo-coral);
         }
         
         .footer-column ul {
@@ -276,45 +296,101 @@
             margin-bottom: 10px;
         }
         
-        .footer-column a {
-            color: #ddd;
+        .footer-column ul li a {
+            color: #bbb;
             text-decoration: none;
             transition: color 0.3s;
         }
         
-        .footer-column a:hover {
-            color: var(--verde-hoja);
-        }
-        
-        .social-links {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
-        }
-        
-        .social-links a {
+        .footer-column ul li a:hover {
             color: white;
-            background-color: rgba(255,255,255,0.1);
-            width: 40px;
-            height: 40px;
+        }
+        
+        .footer-bottom {
+            border-top: 1px solid #444;
+            padding-top: 20px;
+            text-align: center;
+            color: #888;
+            font-size: 0.9rem;
+        }
+        
+        /* Estilos para la sección de proveedores destacados */
+        .featured-providers {
+            padding: 80px 0;
+            background-color: #f9f9f9;
+            border-top: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .providers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .provider-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px 20px;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .provider-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+        
+        .provider-avatar {
+            width: 80px;
+            height: 80px;
+            background-color: var(--gris-reciclaje);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s;
+            margin-bottom: 20px;
         }
         
-        .social-links a:hover {
-            background-color: var(--azul-planeta);
-            transform: translateY(-3px);
+        .provider-avatar i {
+            font-size: 40px;
+            color: white;
         }
         
-        .footer-bottom {
+        .provider-info {
             text-align: center;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            font-size: 0.9rem;
-            color: #999;
+        }
+        
+        .provider-name {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.4rem;
+            color: var(--azul-planeta);
+            margin-bottom: 5px;
+        }
+        
+        .provider-meta {
+            color: #777;
+            margin-bottom: 15px;
+        }
+        
+        .provider-products {
+            display: inline-block;
+            background-color: var(--verde-hoja);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+        
+        .provider-card:hover .provider-products {
+            background-color: var(--verde-bosque);
         }
         
         @media (max-width: 768px) {
@@ -322,14 +398,13 @@
                 font-size: 2.5rem;
             }
             
-            .nav-links {
-                display: none;
+            nav {
+                flex-direction: column;
+                gap: 15px;
             }
             
-            .mobile-menu-btn {
-                display: block;
-                font-size: 1.5rem;
-                cursor: pointer;
+            .nav-links {
+                margin: 15px 0;
             }
         }
     </style>
@@ -343,20 +418,21 @@
                     <a href="/" class="active">Inicio</a>
                     <a href="#">Cómo Funciona</a>
                     <a href="/marketplace">Marketplace</a>
-                    <a href="#">Empresas</a>
+                    <a href="/materiales">Materiales</a>
                     <a href="#">Contacto</a>
                 </div>
-                <button class="cta-button">¡Comienza Ya!</button>
+                <button class="cta-button">¡Publicar Material!</button>
             </nav>
         </div>
     </header>
     
     <section class="hero">
         <div class="container">
-            <h1>Hazle upcycling a tus cachureos</h1>
+            <h1>Hazle un Revamp a tus Desechos</h1>
             <p>Conectamos tus objetos en desuso con empresas y transportistas que les darán una segunda vida, contribuyendo a un mundo más sostenible.</p>
             <button class="cta-button">Descubre Cómo</button>
             <a href="/marketplace" class="cta-button" style="display: inline-block; margin-left: 15px; background-color: var(--verde-bosque);">Visitar Marketplace</a>
+            <a href="/materiales" class="cta-button" style="display: inline-block; margin-left: 15px; background-color: var(--azul-planeta);">Explorar Materiales</a>
         </div>
     </section>
     
@@ -418,6 +494,58 @@
         </div>
     </section>
     
+    <!-- Nueva sección de proveedores destacados -->
+    <section class="featured-providers">
+        <div class="container">
+            <h2 class="section-title">Proveedores Destacados</h2>
+            <p style="text-align: center; max-width: 700px; margin: 0 auto 40px; color: #555;">
+                Estos son algunos de nuestros proveedores más activos que están contribuyendo a la economía circular con sus materiales.
+            </p>
+            <div class="providers-grid">
+                <a href="{{ url_for('vista_receptor', receptor='Juan') }}" class="provider-card">
+                    <div class="provider-avatar">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="provider-info">
+                        <h3 class="provider-name">Juan</h3>
+                        <p class="provider-meta">Especialista en textiles</p>
+                        <span class="provider-products">Ver productos</span>
+                    </div>
+                </a>
+                <a href="{{ url_for('vista_receptor', receptor='María') }}" class="provider-card">
+                    <div class="provider-avatar">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="provider-info">
+                        <h3 class="provider-name">María</h3>
+                        <p class="provider-meta">Electrodomésticos y metales</p>
+                        <span class="provider-products">Ver productos</span>
+                    </div>
+                </a>
+                <a href="{{ url_for('vista_receptor', receptor='Carlos') }}" class="provider-card">
+                    <div class="provider-avatar">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="provider-info">
+                        <h3 class="provider-name">Carlos</h3>
+                        <p class="provider-meta">Materiales de madera</p>
+                        <span class="provider-products">Ver productos</span>
+                    </div>
+                </a>
+                <a href="{{ url_for('vista_receptor', receptor='Lucía') }}" class="provider-card">
+                    <div class="provider-avatar">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="provider-info">
+                        <h3 class="provider-name">Lucía</h3>
+                        <p class="provider-meta">Muebles restaurables</p>
+                        <span class="provider-products">Ver productos</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+    
     <section class="partners">
         <div class="container">
             <h2 class="section-title">Empresas Asociadas</h2>
@@ -433,10 +561,11 @@
     
     <section class="cta-section">
         <div class="container">
-            <h2>¿Listo para darle una segunda vida a tus cachureos?</h2>
+            <h2>¿Listo para darle un Revamp a tus Desechos?</h2>
             <p>Únete a la comunidad de Revamp y forma parte del cambio hacia un consumo más responsable.</p>
             <button class="cta-button">Regístrate Gratis</button>
             <a href="/marketplace" class="cta-button" style="display: inline-block; margin-left: 15px; background-color: var(--verde-bosque);">Explora el Marketplace</a>
+            <a href="/materiales" class="cta-button" style="display: inline-block; margin-left: 15px; background-color: var(--azul-planeta);">Conoce los Materiales</a>
         </div>
     </section>
     
@@ -460,6 +589,7 @@
                         <li><a href="#">Sobre Nosotros</a></li>
                         <li><a href="#">Cómo Funciona</a></li>
                         <li><a href="/marketplace">Marketplace</a></li>
+                        <li><a href="/materiales">Materiales</a></li>
                         <li><a href="#">Contacto</a></li>
                     </ul>
                 </div>

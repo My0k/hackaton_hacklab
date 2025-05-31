@@ -83,5 +83,99 @@ def captain_health_check():
 def wellknown(filename):
     return send_from_directory(os.path.join(app.root_path, '.well-known'), filename)
 
+@app.route('/materiales')
+def materiales():
+    return render_template('materiales.html')
+
+@app.route('/receptor/<receptor>')
+def vista_receptor(receptor):
+    # Cargar todos los productos
+    all_products = load_products()
+    
+    # Filtrar productos por receptor (descartador)
+    receptor_products = [p for p in all_products if p['descartador'].lower() == receptor.lower()]
+    
+    # Obtener todas las categorías únicas para los filtros
+    all_categories = get_all_categories(all_products)
+    
+    # Obtener lista de receptores únicos para la navegación
+    all_receptors = sorted(list(set([p['descartador'] for p in all_products])))
+    
+    return render_template('receptor.html', 
+                          products=receptor_products, 
+                          categories=all_categories,
+                          receptor_name=receptor,
+                          all_receptors=all_receptors)
+
+@app.route('/receptores')
+@app.route('/receptores/<categoria>')
+def receptores(categoria=None):
+    # Simulamos datos de empresas receptoras
+    receptores = [
+        {
+            'id': 1,
+            'nombre': 'EcoMuebles',
+            'logo': 'https://via.placeholder.com/150',
+            'descripcion': 'Empresa dedicada a la transformación de madera y muebles viejos en piezas renovadas.',
+            'categorias': ['Madera', 'Muebles', 'Textiles'],
+            'ubicacion': 'Santiago Centro',
+            'contacto': 'contacto@ecomuebles.cl'
+        },
+        {
+            'id': 2,
+            'nombre': 'MetalArte',
+            'logo': 'https://via.placeholder.com/150',
+            'descripcion': 'Especialistas en dar nueva vida a todo tipo de metales y chatarra convirtiéndolos en arte funcional.',
+            'categorias': ['Chatarra', 'Metales', 'Electrónicos'],
+            'ubicacion': 'Providencia',
+            'contacto': 'info@metalarte.cl'
+        },
+        {
+            'id': 3,
+            'nombre': 'PlastiRenova',
+            'logo': 'https://via.placeholder.com/150',
+            'descripcion': 'Transformamos plásticos desechados en nuevos productos útiles para el hogar y la oficina.',
+            'categorias': ['Plástico', 'PET', 'Envases'],
+            'ubicacion': 'Ñuñoa',
+            'contacto': 'hola@plastirenova.cl'
+        },
+        {
+            'id': 4,
+            'nombre': 'TextilCreativo',
+            'logo': 'https://via.placeholder.com/150',
+            'descripcion': 'Damos nueva vida a textiles usados creando prendas únicas y accesorios sostenibles.',
+            'categorias': ['Textiles', 'Ropa', 'Telas'],
+            'ubicacion': 'Las Condes',
+            'contacto': 'contacto@textilcreativo.cl'
+        },
+        {
+            'id': 5,
+            'nombre': 'ElectroFix',
+            'logo': 'https://via.placeholder.com/150',
+            'descripcion': 'Reparamos y renovamos aparatos electrónicos dándoles una segunda oportunidad.',
+            'categorias': ['Electrónicos', 'Reparables', 'Eléctricos'],
+            'ubicacion': 'La Florida',
+            'contacto': 'info@electrofix.cl'
+        }
+    ]
+    
+    # Obtener todas las categorías únicas
+    todas_categorias = set()
+    for receptor in receptores:
+        for cat in receptor['categorias']:
+            todas_categorias.add(cat)
+    todas_categorias = sorted(list(todas_categorias))
+    
+    # Filtrar por categoría si se especifica
+    if categoria:
+        receptores_filtrados = [r for r in receptores if categoria in r['categorias']]
+    else:
+        receptores_filtrados = receptores
+    
+    return render_template('receptores.html', 
+                          receptores=receptores_filtrados, 
+                          categorias=todas_categorias,
+                          categoria_seleccionada=categoria)
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True) 

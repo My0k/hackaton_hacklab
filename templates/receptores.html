@@ -3,25 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marketplace - Revamp.cl</title>
+    <title>Receptores - Revamp.cl</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <style>
-        .marketplace-header {
-            background: linear-gradient(135deg, rgba(165, 214, 92, 0.2), rgba(108, 179, 78, 0.3));
+        .receptores-header {
+            background: linear-gradient(135deg, rgba(249, 95, 98, 0.1), rgba(249, 168, 37, 0.2));
             padding: 40px 0;
             text-align: center;
         }
         
-        .marketplace-title {
-            color: var(--verde-bosque);
+        .receptores-title {
+            color: var(--rojo-coral);
             font-family: 'Montserrat', sans-serif;
             font-size: 2.5rem;
             margin-bottom: 15px;
         }
         
-        .marketplace-description {
+        .receptores-description {
             max-width: 800px;
             margin: 0 auto 30px;
             color: #555;
@@ -80,57 +80,76 @@
             background-color: var(--azul-planeta);
         }
         
-        .products-grid {
+        .receptores-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            grid-template-columns: 1fr;
             gap: 30px;
             padding: 20px 0;
         }
         
-        .product-card {
+        .receptor-card {
             background-color: white;
             border-radius: 10px;
             overflow: hidden;
             box-shadow: 0 3px 15px rgba(0,0,0,0.08);
             transition: transform 0.3s;
+            display: flex;
+            flex-direction: row;
         }
         
-        .product-card:hover {
+        @media (max-width: 768px) {
+            .receptor-card {
+                flex-direction: column;
+            }
+        }
+        
+        .receptor-card:hover {
             transform: translateY(-5px);
         }
         
-        .product-image {
-            width: 100%;
-            height: 200px;
+        .receptor-logo {
+            flex: 0 0 150px;
+            height: 150px;
             object-fit: cover;
-            border-bottom: 3px solid var(--gris-reciclaje);
+            background-color: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
-        .product-details {
+        .receptor-logo img {
+            max-width: 120px;
+            max-height: 120px;
+        }
+        
+        .receptor-details {
+            flex: 1;
             padding: 20px;
+            display: flex;
+            flex-direction: column;
         }
         
-        .product-title {
+        .receptor-title {
             font-family: 'Montserrat', sans-serif;
             color: var(--azul-planeta);
-            font-size: 1.2rem;
+            font-size: 1.5rem;
             margin-bottom: 10px;
         }
         
-        .product-description {
+        .receptor-description {
             color: #666;
             margin-bottom: 15px;
             font-size: 0.95rem;
         }
         
-        .product-categories {
+        .receptor-categorias {
             display: flex;
             flex-wrap: wrap;
             gap: 5px;
             margin-bottom: 15px;
         }
         
-        .product-category {
+        .receptor-categoria {
             background-color: #f0f0f0;
             color: #666;
             font-size: 0.8rem;
@@ -138,26 +157,28 @@
             border-radius: 10px;
         }
         
-        .product-meta {
+        .receptor-meta {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 15px;
+            margin-top: auto;
             border-top: 1px solid #eee;
             padding-top: 15px;
         }
         
-        .transport-cost {
-            color: var(--naranja-sol);
-            font-weight: 600;
-        }
-        
-        .product-owner {
+        .receptor-ubicacion {
             color: #777;
             font-size: 0.9rem;
+            display: flex;
+            align-items: center;
         }
         
-        .interest-button {
+        .receptor-ubicacion i {
+            margin-right: 5px;
+            color: var(--verde-bosque);
+        }
+        
+        .contact-button {
             background-color: var(--rojo-coral);
             color: white;
             border: none;
@@ -166,12 +187,10 @@
             font-weight: 500;
             cursor: pointer;
             transition: all 0.3s;
-            display: block;
-            width: 100%;
-            margin-top: 15px;
+            text-decoration: none;
         }
         
-        .interest-button:hover {
+        .contact-button:hover {
             background-color: #e54b4e;
         }
         
@@ -179,6 +198,20 @@
             text-align: center;
             padding: 50px 0;
             color: #777;
+        }
+        
+        .join-as-receptor {
+            text-align: center;
+            background-color: #f9f9f9;
+            padding: 30px;
+            margin-top: 40px;
+            border-radius: 10px;
+            border: 1px dashed #ddd;
+        }
+        
+        .join-as-receptor h3 {
+            color: var(--azul-planeta);
+            margin-bottom: 15px;
         }
     </style>
 </head>
@@ -190,8 +223,9 @@
                 <div class="nav-links">
                     <a href="/">Inicio</a>
                     <a href="#">Cómo Funciona</a>
-                    <a href="/marketplace" class="active">Marketplace</a>
+                    <a href="/marketplace">Marketplace</a>
                     <a href="/materiales">Materiales</a>
+                    <a href="/receptores" class="active">Receptores</a>
                     <a href="#">Contacto</a>
                 </div>
                 <button class="cta-button">¡Publicar Material!</button>
@@ -199,62 +233,70 @@
         </div>
     </header>
     
-    <section class="marketplace-header">
+    <section class="receptores-header">
         <div class="container">
-            <h1 class="marketplace-title">Hazle un Revamp a tus Desechos</h1>
-            <p class="marketplace-description">Descubre objetos que buscan una segunda vida. Conectamos lo que ya no usas con quienes le darán un nuevo propósito.</p>
+            <h1 class="receptores-title">Empresas Receptoras</h1>
+            <p class="receptores-description">Conectamos tus materiales desechados con empresas especializadas que les darán una nueva vida y propósito.</p>
         </div>
     </section>
     
     <section class="container">
         <div class="filters">
-            <h3 class="filter-title">Filtros por Categoría</h3>
+            <h3 class="filter-title">Filtrar por tipo de material</h3>
             <div class="filter-options">
-                {% for category in categories %}
-                    <a href="{{ url_for('marketplace', categoria=category) }}" 
-                       class="filter-tag {% if selected_category == category %}active{% endif %}">
-                        {{ category }}
+                {% for categoria in categorias %}
+                    <a href="{{ url_for('receptores', categoria=categoria) }}" 
+                       class="filter-tag {% if categoria_seleccionada == categoria %}active{% endif %}">
+                        {{ categoria }}
                     </a>
                 {% endfor %}
-                {% if selected_category %}
-                    <a href="{{ url_for('marketplace') }}" class="clear-filter">Quitar filtros</a>
+                {% if categoria_seleccionada %}
+                    <a href="{{ url_for('receptores') }}" class="clear-filter">Quitar filtros</a>
                 {% endif %}
             </div>
         </div>
         
-        <div class="products-grid">
-            {% for product in products %}
-            <div class="product-card">
-                <img src="{{ product.imagen_url }}" alt="{{ product.titulo }}" class="product-image">
-                <div class="product-details">
-                    <h3 class="product-title">{{ product.titulo }}</h3>
-                    <p class="product-description">{{ product.descripcion }}</p>
+        <div class="receptores-grid">
+            {% for receptor in receptores %}
+            <div class="receptor-card">
+                <div class="receptor-logo">
+                    <img src="{{ receptor.logo }}" alt="{{ receptor.nombre }}">
+                </div>
+                <div class="receptor-details">
+                    <h3 class="receptor-title">{{ receptor.nombre }}</h3>
+                    <p class="receptor-description">{{ receptor.descripcion }}</p>
                     
-                    <!-- Mostrar categorías de cada producto -->
-                    {% if product.categorias_lista %}
-                    <div class="product-categories">
-                        {% for category in product.categorias_lista %}
-                            <span class="product-category">{{ category }}</span>
+                    <div class="receptor-categorias">
+                        {% for categoria in receptor.categorias %}
+                            <span class="receptor-categoria">{{ categoria }}</span>
                         {% endfor %}
                     </div>
-                    {% endif %}
                     
-                    <div class="product-meta">
-                        <span class="transport-cost">Transporte: ${{ product.costo_transporte }}</span>
-                        <span class="product-owner">Por: <a href="{{ url_for('vista_receptor', receptor=product.descartador) }}" style="color: var(--azul-planeta); text-decoration: none;">{{ product.descartador }}</a></span>
+                    <div class="receptor-meta">
+                        <span class="receptor-ubicacion">
+                            <i class="fas fa-map-marker-alt"></i> {{ receptor.ubicacion }}
+                        </span>
+                        <a href="mailto:{{ receptor.contacto }}" class="contact-button">
+                            <i class="fas fa-envelope"></i> Contactar
+                        </a>
                     </div>
-                    <button class="interest-button">Me interesa</button>
                 </div>
             </div>
             {% endfor %}
             
-            {% if not products %}
+            {% if not receptores %}
             <div class="empty-state">
-                <i class="fas fa-box-open" style="font-size: 3rem; color: var(--gris-reciclaje); margin-bottom: 20px;"></i>
-                <h3>No hay productos disponibles</h3>
-                <p>{% if selected_category %}No hay productos en la categoría "{{ selected_category }}". Prueba con otra categoría.{% else %}Parece que no hay productos disponibles en este momento. ¡Vuelve pronto!{% endif %}</p>
+                <i class="fas fa-building" style="font-size: 3rem; color: var(--gris-reciclaje); margin-bottom: 20px;"></i>
+                <h3>No hay empresas receptoras disponibles</h3>
+                <p>{% if categoria_seleccionada %}No hay empresas que acepten materiales de tipo "{{ categoria_seleccionada }}". Prueba con otra categoría.{% else %}Parece que no hay empresas receptoras disponibles en este momento. ¡Vuelve pronto!{% endif %}</p>
             </div>
             {% endif %}
+        </div>
+        
+        <div class="join-as-receptor">
+            <h3>¿Eres una empresa interesada en materiales reciclables?</h3>
+            <p>Únete a nuestra red de empresas receptoras y accede a materiales seleccionados para tu proceso productivo.</p>
+            <a href="#" class="contact-button" style="margin-top: 15px;">Registra tu empresa</a>
         </div>
     </section>
     
@@ -279,6 +321,7 @@
                         <li><a href="#">Cómo Funciona</a></li>
                         <li><a href="/marketplace">Marketplace</a></li>
                         <li><a href="/materiales">Materiales</a></li>
+                        <li><a href="/receptores">Receptores</a></li>
                         <li><a href="#">Contacto</a></li>
                     </ul>
                 </div>
@@ -306,4 +349,4 @@
         </div>
     </footer>
 </body>
-</html>
+</html> 

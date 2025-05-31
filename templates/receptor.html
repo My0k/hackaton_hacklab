@@ -3,81 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marketplace - Revamp.cl</title>
+    <title>Receptor: {{ receptor_name }} - Revamp.cl</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <style>
-        .marketplace-header {
-            background: linear-gradient(135deg, rgba(165, 214, 92, 0.2), rgba(108, 179, 78, 0.3));
+        .receptor-header {
+            background: linear-gradient(135deg, rgba(59, 157, 213, 0.2), rgba(121, 197, 190, 0.3));
             padding: 40px 0;
             text-align: center;
         }
         
-        .marketplace-title {
-            color: var(--verde-bosque);
+        .receptor-title {
+            color: var(--azul-planeta);
             font-family: 'Montserrat', sans-serif;
             font-size: 2.5rem;
             margin-bottom: 15px;
         }
         
-        .marketplace-description {
+        .receptor-description {
             max-width: 800px;
             margin: 0 auto 30px;
             color: #555;
         }
         
-        .filters {
+        .receptor-name {
+            display: inline-block;
+            background-color: var(--azul-planeta);
+            color: white;
+            padding: 3px 15px;
+            border-radius: 50px;
+            font-weight: 500;
+        }
+        
+        .receptors-tabs {
             background-color: white;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
             margin-bottom: 30px;
+            overflow-x: auto;
         }
         
-        .filter-title {
-            font-family: 'Montserrat', sans-serif;
-            color: var(--azul-planeta);
-            margin-bottom: 15px;
-        }
-        
-        .filter-options {
+        .receptors-list {
             display: flex;
-            flex-wrap: wrap;
             gap: 10px;
+            flex-wrap: nowrap;
+            padding-bottom: 5px;
         }
         
-        .filter-tag {
-            background-color: var(--verde-hoja);
-            color: white;
-            padding: 5px 15px;
+        .receptor-tab {
+            background-color: #f0f0f0;
+            color: #555;
+            padding: 8px 20px;
             border-radius: 20px;
-            cursor: pointer;
+            white-space: nowrap;
             transition: all 0.3s;
             text-decoration: none;
         }
         
-        .filter-tag:hover {
-            background-color: var(--verde-bosque);
-        }
-        
-        .filter-tag.active {
-            background-color: var(--naranja-sol);
-        }
-        
-        .clear-filter {
+        .receptor-tab:hover {
             background-color: var(--gris-reciclaje);
             color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            margin-left: 10px;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-decoration: none;
         }
         
-        .clear-filter:hover {
+        .receptor-tab.active {
             background-color: var(--azul-planeta);
+            color: white;
         }
         
         .products-grid {
@@ -180,6 +172,27 @@
             padding: 50px 0;
             color: #777;
         }
+        
+        .back-to-marketplace {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 25px;
+            background-color: var(--verde-hoja);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            transition: all 0.3s;
+        }
+        
+        .back-to-marketplace:hover {
+            background-color: var(--verde-bosque);
+        }
+        
+        @media (max-width: 768px) {
+            .receptors-list {
+                overflow-x: auto;
+            }
+        }
     </style>
 </head>
 <body>
@@ -190,7 +203,7 @@
                 <div class="nav-links">
                     <a href="/">Inicio</a>
                     <a href="#">Cómo Funciona</a>
-                    <a href="/marketplace" class="active">Marketplace</a>
+                    <a href="/marketplace">Marketplace</a>
                     <a href="/materiales">Materiales</a>
                     <a href="#">Contacto</a>
                 </div>
@@ -199,26 +212,24 @@
         </div>
     </header>
     
-    <section class="marketplace-header">
+    <section class="receptor-header">
         <div class="container">
-            <h1 class="marketplace-title">Hazle un Revamp a tus Desechos</h1>
-            <p class="marketplace-description">Descubre objetos que buscan una segunda vida. Conectamos lo que ya no usas con quienes le darán un nuevo propósito.</p>
+            <h1 class="receptor-title">Productos de <span class="receptor-name">{{ receptor_name }}</span></h1>
+            <p class="receptor-description">Explora todos los productos disponibles de este proveedor.</p>
+            <a href="/marketplace" class="back-to-marketplace"><i class="fas fa-arrow-left"></i> Volver al Marketplace</a>
         </div>
     </section>
     
     <section class="container">
-        <div class="filters">
-            <h3 class="filter-title">Filtros por Categoría</h3>
-            <div class="filter-options">
-                {% for category in categories %}
-                    <a href="{{ url_for('marketplace', categoria=category) }}" 
-                       class="filter-tag {% if selected_category == category %}active{% endif %}">
-                        {{ category }}
+        <div class="receptors-tabs">
+            <h3 style="margin-bottom: 15px; color: var(--azul-planeta);">Cambiar Proveedor:</h3>
+            <div class="receptors-list">
+                {% for receptor in all_receptors %}
+                    <a href="{{ url_for('vista_receptor', receptor=receptor) }}" 
+                       class="receptor-tab {% if receptor_name == receptor %}active{% endif %}">
+                        {{ receptor }}
                     </a>
                 {% endfor %}
-                {% if selected_category %}
-                    <a href="{{ url_for('marketplace') }}" class="clear-filter">Quitar filtros</a>
-                {% endif %}
             </div>
         </div>
         
@@ -241,7 +252,7 @@
                     
                     <div class="product-meta">
                         <span class="transport-cost">Transporte: ${{ product.costo_transporte }}</span>
-                        <span class="product-owner">Por: <a href="{{ url_for('vista_receptor', receptor=product.descartador) }}" style="color: var(--azul-planeta); text-decoration: none;">{{ product.descartador }}</a></span>
+                        <span class="product-owner">Por: {{ product.descartador }}</span>
                     </div>
                     <button class="interest-button">Me interesa</button>
                 </div>
@@ -250,9 +261,10 @@
             
             {% if not products %}
             <div class="empty-state">
-                <i class="fas fa-box-open" style="font-size: 3rem; color: var(--gris-reciclaje); margin-bottom: 20px;"></i>
+                <i class="fas fa-user-slash" style="font-size: 3rem; color: var(--gris-reciclaje); margin-bottom: 20px;"></i>
                 <h3>No hay productos disponibles</h3>
-                <p>{% if selected_category %}No hay productos en la categoría "{{ selected_category }}". Prueba con otra categoría.{% else %}Parece que no hay productos disponibles en este momento. ¡Vuelve pronto!{% endif %}</p>
+                <p>No se encontraron productos para el proveedor "{{ receptor_name }}" en este momento.</p>
+                <a href="/marketplace" class="back-to-marketplace" style="margin-top: 20px;">Ver todos los productos</a>
             </div>
             {% endif %}
         </div>
@@ -306,4 +318,4 @@
         </div>
     </footer>
 </body>
-</html>
+</html> 

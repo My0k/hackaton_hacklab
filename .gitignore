@@ -1,0 +1,94 @@
+# Entornos virtuales
+venv/
+env/
+ENV/
+.env
+.venv
+env.bak/
+venv.bak/
+pythonenv*
+
+# Archivos de Python compilados
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Archivos de log
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Archivos de Flask
+instance/
+.webassets-cache
+
+# Archivos de pruebas y cobertura
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Archivos de traducción
+*.mo
+*.pot
+
+# Archivos de Django
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media
+
+# Archivos temporales
+.DS_Store
+._.DS_Store
+*.swp
+*.tmp
+*~
+
+# Archivos de IDE/editores
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+.vs/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.project
+.pydevproject
+.settings/
+
+# Archivos específicos del proyecto
+secrets.json
+config.ini
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local 

@@ -343,24 +343,30 @@ def crear_revamp():
                 imagen = request.files['photo']
                 # Generar nombre único para la imagen
                 nombre_archivo = f"{uuid.uuid4()}_{secure_filename(imagen.filename)}"
-                ruta_guardado = os.path.join('static', 'uploads', nombre_archivo)
-                os.makedirs(os.path.join('static', 'uploads'), exist_ok=True)
+                
+                # Guardar en la carpeta /static/fotos (donde están las otras imágenes)
+                ruta_guardado = os.path.join('static', 'fotos', nombre_archivo)
+                os.makedirs(os.path.join('static', 'fotos'), exist_ok=True)
                 imagen.save(ruta_guardado)
-                imagen_url = nombre_archivo  # Guardar solo el nombre del archivo
+                
+                # Guardar la URL en el formato que usa el resto de productos
+                imagen_url = f"/static/fotos/{nombre_archivo}"
+                
             elif 'camera_image' in request.form and request.form['camera_image']:
                 # Si se capturó una imagen con la cámara (base64)
                 b64_imagen = request.form['camera_image'].split(',')[1] if ',' in request.form['camera_image'] else request.form['camera_image']
                 imagen_bytes = base64.b64decode(b64_imagen)
                 
-                # Guardar la imagen
+                # Guardar la imagen en la carpeta correcta
                 nombre_archivo = f"{uuid.uuid4()}.jpg"
-                ruta_guardado = os.path.join('static', 'uploads', nombre_archivo)
-                os.makedirs(os.path.join('static', 'uploads'), exist_ok=True)
+                ruta_guardado = os.path.join('static', 'fotos', nombre_archivo)
+                os.makedirs(os.path.join('static', 'fotos'), exist_ok=True)
                 
                 with open(ruta_guardado, 'wb') as f:
                     f.write(imagen_bytes)
                 
-                imagen_url = nombre_archivo  # Guardar solo el nombre del archivo
+                # Guardar la URL en el formato que usa el resto de productos
+                imagen_url = f"/static/fotos/{nombre_archivo}"
             
             # Generar un SKU único
             sku = str(uuid.uuid4())[:8]

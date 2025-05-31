@@ -1,0 +1,87 @@
+<!-- Reemplazar la sección de proveedores destacados por materiales destacados -->
+<section class="featured-providers">
+    <div class="container">
+        <h2 class="section-title">Materiales Destacados</h2>
+        <p style="text-align: center; max-width: 700px; margin: 0 auto 40px; color: #555;">
+            Explora los principales tipos de materiales disponibles para tu proyecto de economía circular.
+        </p>
+        <div class="providers-grid">
+            <a href="{{ url_for('materiales_disponibles', material='Textiles') }}" class="provider-card">
+                <div class="provider-avatar" style="background-color: #F95F62;">
+                    <i class="fas fa-tshirt"></i>
+                </div>
+                <div class="provider-info">
+                    <h3 class="provider-name">Textiles</h3>
+                    <p class="provider-meta">Ropa, telas, retazos y más</p>
+                    <span class="provider-products">Ver materiales</span>
+                </div>
+            </a>
+            <a href="{{ url_for('materiales_disponibles', material='Madera') }}" class="provider-card">
+                <div class="provider-avatar" style="background-color: #A5D65C;">
+                    <i class="fas fa-tree"></i>
+                </div>
+                <div class="provider-info">
+                    <h3 class="provider-name">Madera</h3>
+                    <p class="provider-meta">Muebles, tablas, pallets y más</p>
+                    <span class="provider-products">Ver materiales</span>
+                </div>
+            </a>
+            <a href="{{ url_for('materiales_disponibles', material='Chatarra') }}" class="provider-card">
+                <div class="provider-avatar" style="background-color: #3B9DD5;">
+                    <i class="fas fa-cogs"></i>
+                </div>
+                <div class="provider-info">
+                    <h3 class="provider-name">Chatarra</h3>
+                    <p class="provider-meta">Metales, electrónicos, cables</p>
+                    <span class="provider-products">Ver materiales</span>
+                </div>
+            </a>
+            <a href="{{ url_for('materiales_disponibles', material='Plástico') }}" class="provider-card">
+                <div class="provider-avatar" style="background-color: #79C5BE;">
+                    <i class="fas fa-wine-bottle"></i>
+                </div>
+                <div class="provider-info">
+                    <h3 class="provider-name">Plástico</h3>
+                    <p class="provider-meta">Envases, botellas y más</p>
+                    <span class="provider-products">Ver materiales</span>
+                </div>
+            </a>
+        </div>
+    </div>
+</section>
+
+<section class="cta-section">
+    <div class="container">
+        <h2>¿Listo para darle un Revamp a tus Desechos?</h2>
+        <p>Únete a la comunidad de Revamp y forma parte del cambio hacia un consumo más responsable.</p>
+        <button class="cta-button">Regístrate Gratis</button>
+        <a href="/marketplace" class="cta-button" style="display: inline-block; margin-left: 15px; background-color: var(--verde-bosque);">Explora el Marketplace</a>
+        <a href="/materiales-disponibles" class="cta-button" style="display: inline-block; margin-left: 15px; background-color: var(--azul-planeta);">Ver Materiales Disponibles</a>
+    </div>
+</section>
+
+<nav>
+    <div class="logo">Revamp<span>.cl</span></div>
+    <div class="nav-links">
+        <a href="/">Inicio</a>
+        <a href="/marketplace">Marketplace</a>
+        <a href="/materiales">Materiales</a>
+        <a href="/materiales-disponibles">Materiales Disponibles</a>
+        <a href="/receptores">Receptores</a>
+    </div>
+    <button class="cta-button">Registrarse</button>
+</nav>
+
+<div class="footer-column">
+    <h3>Enlaces</h3>
+    <ul>
+        <li><a href="/">Inicio</a></li>
+        <li><a href="#">Sobre Nosotros</a></li>
+        <li><a href="#">Cómo Funciona</a></li>
+        <li><a href="/marketplace">Marketplace</a></li>
+        <li><a href="/materiales">Materiales</a></li>
+        <li><a href="/materiales-disponibles">Materiales Disponibles</a></li>
+        <li><a href="/receptores">Receptores</a></li>
+        <li><a href="#">Contacto</a></li>
+    </ul>
+</div> 

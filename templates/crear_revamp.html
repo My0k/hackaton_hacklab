@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crea tu Revamp - Revamp.cl</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <style>
+        :root {
+            --verde-hoja: #A5D65C;
+            --rojo-coral: #F95F62;
+            --azul-planeta: #3B9DD5;
+            --gris-reciclaje: #79C5BE;
+            --naranja-sol: #F9A825;
+            --verde-bosque: #6CB34E;
+        }
+        
+        .crear-header {
+            background: linear-gradient(135deg, rgba(249, 95, 98, 0.1), rgba(249, 168, 37, 0.2));
+            padding: 40px 0;
+            text-align: center;
+        }
+        
+        .crear-title {
+            color: var(--rojo-coral);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+        
+        .crear-description {
+            max-width: 800px;
+            margin: 0 auto 30px;
+            color: #555;
+        }
+        
+        .crear-form-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 40px 0;
+        }
+        
+        .crear-form {
+            background-color: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--verde-bosque);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+        }
+        
+        .form-textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            min-height: 120px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            resize: vertical;
+        }
+        
+        .photo-upload-container {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+        
+        .photo-upload-container:hover {
+            border-color: var(--azul-planeta);
+        }
+        
+        .photo-icon {
+            font-size: 3rem;
+            color: #aaa;
+            margin-bottom: 15px;
+        }
+        
+        .photo-preview {
+            max-width: 100%;
+            max-height: 300px;
+            margin-top: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .photo-upload-text {
+            color: #666;
+        }
+        
+        .form-submit {
+            background-color: var(--rojo-coral);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: block;
+            width: 100%;
+            margin-top: 15px;
+        }
+        
+        .form-submit:hover {
+            background-color: #e54b4e;
+            transform: translateY(-2px);
+        }
+        
+        .success-message {
+            background-color: var(--verde-hoja);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .mobile-camera-button {
+            background-color: var(--azul-planeta);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .crear-form {
+                padding: 20px;
+            }
+            
+            .mobile-camera-button {
+                display: inline-block;
+            }
+            
+            .crear-title {
+                font-size: 2rem;
+            }
+        }
+        
+        .highlight-link {
+            color: var(--rojo-coral) !important;
+            font-weight: 600 !important;
+        }
+
+        .highlight-link:hover {
+            color: var(--naranja-sol) !important;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">Revamp<span>.cl</span></div>
+                <div class="nav-links">
+                    <a href="/">Inicio</a>
+                    <a href="#">Cómo Funciona</a>
+                    <a href="/marketplace">Marketplace</a>
+                    <a href="/materiales">Materiales</a>
+                    <a href="/receptores">Receptores</a>
+                    <a href="/crear-revamp" class="highlight-link active">Crea tu Revamp</a>
+                    <a href="#">Contacto</a>
+                </div>
+                <button class="cta-button">¡Publicar Material!</button>
+            </nav>
+        </div>
+    </header>
+    
+    <section class="crear-header">
+        <div class="container">
+            <h1 class="crear-title">Crea tu Revamp</h1>
+            <p class="crear-description">Comparte los materiales u objetos que ya no utilizas para darles una segunda vida.</p>
+        </div>
+    </section>
+    
+    <section class="crear-form-container">
+        <div class="container">
+            {% if mensaje %}
+            <div class="success-message">
+                {{ mensaje }}
+            </div>
+            {% endif %}
+            
+            <form class="crear-form" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label class="form-label">Foto del Material</label>
+                    <div class="photo-upload-container" id="photoUploadContainer">
+                        <i class="fas fa-camera photo-icon"></i>
+                        <p class="photo-upload-text">Haz clic para subir una foto o arrastrar y soltar</p>
+                        <img id="photoPreview" class="photo-preview" alt="Vista previa de la foto">
+                        <input type="file" id="photoInput" name="photo" accept="image/*" style="display: none;">
+                    </div>
+                    <button type="button" class="mobile-camera-button" id="mobileCameraButton">
+                        <i class="fas fa-camera"></i> Tomar Foto
+                    </button>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="details">Detalles del Material</label>
+                    <textarea class="form-textarea" id="details" name="details" placeholder="Describe brevemente el material u objeto que quieres compartir..."></textarea>
+                </div>
+                
+                <button type="submit" class="form-submit">Crear Revamp</button>
+            </form>
+        </div>
+    </section>
+    
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>Revamp.cl</h3>
+                    <p>Transformando el concepto de residuo en recurso, un objeto a la vez.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>Enlaces</h3>
+                    <ul>
+                        <li><a href="/">Inicio</a></li>
+                        <li><a href="#">Sobre Nosotros</a></li>
+                        <li><a href="#">Cómo Funciona</a></li>
+                        <li><a href="/marketplace">Marketplace</a></li>
+                        <li><a href="/materiales">Materiales</a></li>
+                        <li><a href="/crear-revamp">Crea tu Revamp</a></li>
+                        <li><a href="#">Contacto</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Servicios</h3>
+                    <ul>
+                        <li><a href="#">Para Usuarios</a></li>
+                        <li><a href="#">Para Empresas</a></li>
+                        <li><a href="#">Para Transportistas</a></li>
+                        <li><a href="#">Colaboraciones</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Contacto</h3>
+                    <ul>
+                        <li>info@revamp.cl</li>
+                        <li>+56 9 1234 5678</li>
+                        <li>Santiago, Chile</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 Revamp.cl - Todos los derechos reservados</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // JavaScript para manejar la subida de fotos
+        document.addEventListener('DOMContentLoaded', function() {
+            const photoUploadContainer = document.getElementById('photoUploadContainer');
+            const photoInput = document.getElementById('photoInput');
+            const photoPreview = document.getElementById('photoPreview');
+            const mobileCameraButton = document.getElementById('mobileCameraButton');
+            
+            // Manejo del contenedor de upload
+            photoUploadContainer.addEventListener('click', function() {
+                photoInput.click();
+            });
+            
+            // Manejo del botón de cámara móvil
+            mobileCameraButton.addEventListener('click', function() {
+                photoInput.click();
+            });
+            
+            // Previsualización de la foto
+            photoInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        photoPreview.src = e.target.result;
+                        photoPreview.style.display = 'block';
+                    };
+                    
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+            
+            // Manejar arrastrar y soltar
+            photoUploadContainer.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.style.borderColor = var(--azul-planeta);
+            });
+            
+            photoUploadContainer.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                this.style.borderColor = '#ddd';
+            });
+            
+            photoUploadContainer.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.style.borderColor = '#ddd';
+                
+                if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                    photoInput.files = e.dataTransfer.files;
+                    
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        photoPreview.src = e.target.result;
+                        photoPreview.style.display = 'block';
+                    };
+                    
+                    reader.readAsDataURL(e.dataTransfer.files[0]);
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

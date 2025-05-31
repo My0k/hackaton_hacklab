@@ -1,6 +1,6 @@
-nombre_material, etiquetas
+nombre_material, categorias
 Textiles, Textiles|Ropa|Telas|Retazos|Cuero|Lana|Algodón|Mezclilla
-Madera, Madera|Muebles|Tablas|Pallets|Troncos|Ramas|Aserrín|Carpintería
+Madera, Madera|Mueble|Tablas|Pallets|Troncos|Ramas|Aserrín|Carpintería
 Chatarra, Chatarra|Metales|Aluminio|Cobre|Acero|Hierro|Cables|Electrodomésticos
 Plástico, Plástico|PET|HDPE|PVC|LDPE|PP|PS|Envases|Botellas
 Reparables, Electrodomésticos|Computadores|Teléfonos|Bicicletas|Muebles|Herramientas|Electrónicos|Máquinas

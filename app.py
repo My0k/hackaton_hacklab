@@ -29,6 +29,21 @@ def get_all_categories(products):
                 categories.add(category)
     return sorted(list(categories))
 
+def load_materials():
+    materials = []
+    try:
+        with open('materiales.csv', 'r', encoding='utf-8') as file:
+            csv_reader = csv.DictReader(file, skipinitialspace=True)
+            for row in csv_reader:
+                # Convertir categorías de string a lista
+                if 'categorias' in row:
+                    row['categorias_lista'] = row['categorias'].split('|')
+                materials.append(row)
+        return materials
+    except Exception as e:
+        print(f"Error loading materials: {e}")
+        return []
+
 @app.route('/')
 def home():
     try:
@@ -89,24 +104,46 @@ def materiales():
     return render_template('materiales.html')
 
 @app.route('/receptor/<receptor>')
-def vista_receptor(receptor):
+@app.route('/receptor/<receptor>/<categoria>')
+def vista_receptor(receptor, categoria=None):
     # Cargar todos los productos
     all_products = load_products()
+    
+    # Cargar todos los materiales
+    all_materials = load_materials()
+    
+    # Crear un diccionario para mapear materiales a sus categorías
+    material_to_categories = {}
+    material_names = []
+    for mat in all_materials:
+        if 'nombre_material' in mat and 'categorias_lista' in mat:
+            material_to_categories[mat['nombre_material']] = mat['categorias_lista']
+            material_names.append(mat['nombre_material'])
     
     # Filtrar productos por receptor (descartador)
     receptor_products = [p for p in all_products if p['descartador'].lower() == receptor.lower()]
     
-    # Obtener todas las categorías únicas para los filtros
-    all_categories = get_all_categories(all_products)
-    
-    # Obtener lista de receptores únicos para la navegación
-    all_receptors = sorted(list(set([p['descartador'] for p in all_products])))
+    # Filtrar adicionalmente por categoría si se especifica
+    selected_material = None
+    if categoria:
+        # Determinar a qué material pertenece esta categoría
+        for material, categories in material_to_categories.items():
+            if categoria in categories:
+                selected_material = material
+                break
+        
+        # Filtrar productos por la categoría seleccionada
+        receptor_products = [p for p in receptor_products 
+                           if 'categorias_lista' in p and categoria in p['categorias_lista']]
     
     return render_template('receptor.html', 
-                          products=receptor_products, 
-                          categories=all_categories,
+                          products=receptor_products,
+                          materials=all_materials,
+                          material_to_categories=material_to_categories,
+                          material_names=material_names,
                           receptor_name=receptor,
-                          all_receptors=all_receptors)
+                          selected_category=categoria,
+                          selected_material=selected_material)
 
 @app.route('/receptores')
 @app.route('/receptores/<categoria>')
@@ -177,6 +214,124 @@ def receptores(categoria=None):
                           receptores=receptores_filtrados, 
                           categorias=todas_categorias,
                           categoria_seleccionada=categoria)
+
+@app.route('/productos-por-material')
+@app.route('/productos-por-material/<material>')
+def productos_por_material(material=None):
+    # Cargar todos los productos
+    all_products = load_products()
+    
+    # Cargar todos los materiales
+    all_materials = load_materials()
+    
+    # Crear una estructura de datos para el mapeo de materiales a categorías
+    material_to_categories = {}
+    for mat in all_materials:
+        if 'nombre_material' in mat and 'categorias_lista' in mat:
+            material_to_categories[mat['nombre_material']] = mat['categorias_lista']
+    
+    # Determinar las categorías a filtrar basado en el material seleccionado
+    filter_categories = []
+    selected_material_name = None
+    if material:
+        for mat in all_materials:
+            if 'nombre_material' in mat and mat['nombre_material'].lower() == material.lower():
+                if 'categorias_lista' in mat:
+                    filter_categories = mat['categorias_lista']
+                    selected_material_name = mat['nombre_material']
+                break
+    
+    # Filtrar productos según las categorías del material seleccionado
+    if filter_categories:
+        filtered_products = []
+        for product in all_products:
+            if 'categorias_lista' in product:
+                # Un producto coincide si cualquiera de sus categorías está en las categorías del material
+                for category in product['categorias_lista']:
+                    if category.lower() in [c.lower() for c in filter_categories]:
+                        filtered_products.append(product)
+                        break
+    else:
+        filtered_products = all_products
+    
+    # Obtener nombres de materiales para el menú de navegación
+    material_names = [mat['nombre_material'] for mat in all_materials if 'nombre_material' in mat]
+    
+    return render_template('productos_por_material.html',
+                          products=filtered_products,
+                          materials=all_materials,
+                          material_names=material_names,
+                          selected_material=selected_material_name)
+
+@app.route('/materiales-disponibles')
+@app.route('/materiales-disponibles/<material>')
+@app.route('/materiales-disponibles/<material>/<categoria>')
+def materiales_disponibles(material=None, categoria=None):
+    # Cargar todos los productos
+    all_products = load_products()
+    
+    # Cargar todos los materiales
+    all_materials = load_materials()
+    
+    # Crear un diccionario para mapear materiales a sus categorías
+    material_to_categories = {}
+    material_names = []
+    for mat in all_materials:
+        if 'nombre_material' in mat and 'categorias_lista' in mat:
+            material_to_categories[mat['nombre_material']] = mat['categorias_lista']
+            material_names.append(mat['nombre_material'])
+    
+    # Filtrar productos según el material seleccionado
+    filtered_products = all_products
+    
+    if material:
+        # Obtener las categorías del material seleccionado
+        material_categories = []
+        for mat in all_materials:
+            if mat['nombre_material'] == material:
+                material_categories = mat['categorias_lista']
+                break
+        
+        # Si también se seleccionó una categoría específica
+        if categoria and categoria in material_categories:
+            filtered_products = [p for p in all_products 
+                               if 'categorias_lista' in p and categoria in p['categorias_lista']]
+        # Si solo se seleccionó el material, mostrar todos los productos que coincidan con cualquiera de sus categorías
+        else:
+            temp_products = []
+            for product in all_products:
+                if 'categorias_lista' in product:
+                    for cat in product['categorias_lista']:
+                        if cat in material_categories:
+                            temp_products.append(product)
+                            break
+            filtered_products = temp_products
+    
+    # Agrupar productos por proveedor (descartador)
+    proveedores = {}
+    for product in filtered_products:
+        proveedor = product['descartador']
+        if proveedor not in proveedores:
+            proveedores[proveedor] = []
+        proveedores[proveedor].append(product)
+    
+    return render_template('materiales_disponibles.html',
+                          all_products=filtered_products,
+                          proveedores=proveedores,
+                          materials=all_materials,
+                          material_to_categories=material_to_categories,
+                          material_names=material_names,
+                          selected_material=material,
+                          selected_category=categoria)
+
+@app.route('/crear-revamp', methods=['GET', 'POST'])
+def crear_revamp():
+    if request.method == 'POST':
+        # Aquí iría la lógica para procesar la foto y los detalles enviados
+        # Por ahora, simplemente redirigimos de vuelta a la misma página
+        return render_template('crear_revamp.html', mensaje="¡Tu Revamp ha sido creado exitosamente!")
+    
+    return render_template('crear_revamp.html')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True) 

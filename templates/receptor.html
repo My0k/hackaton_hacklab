@@ -191,6 +191,51 @@
         @media (max-width: 768px) {
             .receptors-list {
                 overflow-x: auto;
+                padding-bottom: 10px;
+            }
+            
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            }
+            
+            .receptor-title {
+                font-size: 1.8rem;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 8px;
+            }
+            
+            .subscription-options {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .product-card {
+                margin-bottom: 20px;
+            }
+            
+            .product-meta {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+            
+            .modal-container {
+                width: 95%;
+                padding: 20px;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 30px;
+            }
+            
+            .footer-column {
+                width: 100%;
             }
         }
         
@@ -317,8 +362,8 @@
             <div class="receptors-tabs">
                 <h3 style="margin-bottom: 15px; color: var(--azul-planeta);">Tus Categorías:</h3>
                 <div class="receptors-list">
-                    <a href="#" class="receptor-tab active" id="textil-filter">Textil <span class="filter-remove">✕</span></a>
-                    <a href="#" class="receptor-tab active" id="metal-filter">Metales <span class="filter-remove">✕</span></a>
+                    <a href="#" class="receptor-tab active" id="textil-filter">Textiles <span class="filter-remove">✕</span></a>
+                    <a href="#" class="receptor-tab active" id="metal-filter">Chatarra <span class="filter-remove">✕</span></a>
                     <a href="#" class="receptor-tab" style="background-color: var(--verde-hoja);" id="open-subscription-modal">+ Gestionar suscripciones</a>
                 </div>
             </div>
@@ -413,27 +458,27 @@
             <div class="subscription-options">
                 <div class="subscription-option">
                     <input type="checkbox" id="textil-subscription" class="subscription-checkbox" checked>
-                    <label for="textil-subscription">Textil</label>
+                    <label for="textil-subscription">Textiles</label>
                 </div>
                 <div class="subscription-option">
                     <input type="checkbox" id="metal-subscription" class="subscription-checkbox" checked>
-                    <label for="metal-subscription">Metales</label>
+                    <label for="metal-subscription">Chatarra</label>
                 </div>
                 <div class="subscription-option">
                     <input type="checkbox" id="madera-subscription" class="subscription-checkbox">
                     <label for="madera-subscription">Madera</label>
                 </div>
                 <div class="subscription-option">
-                    <input type="checkbox" id="electronico-subscription" class="subscription-checkbox">
-                    <label for="electronico-subscription">Electrónicos</label>
-                </div>
-                <div class="subscription-option">
                     <input type="checkbox" id="plastico-subscription" class="subscription-checkbox">
                     <label for="plastico-subscription">Plástico</label>
                 </div>
                 <div class="subscription-option">
-                    <input type="checkbox" id="mueble-subscription" class="subscription-checkbox">
-                    <label for="mueble-subscription">Muebles</label>
+                    <input type="checkbox" id="reparables-subscription" class="subscription-checkbox">
+                    <label for="reparables-subscription">Reparables</label>
+                </div>
+                <div class="subscription-option">
+                    <input type="checkbox" id="otros-subscription" class="subscription-checkbox">
+                    <label for="otros-subscription">Otros Materiales</label>
                 </div>
             </div>
             
@@ -494,9 +539,9 @@
                     textil: document.getElementById('textil-subscription').checked,
                     metal: document.getElementById('metal-subscription').checked,
                     madera: document.getElementById('madera-subscription').checked,
-                    electronico: document.getElementById('electronico-subscription').checked,
                     plastico: document.getElementById('plastico-subscription').checked,
-                    mueble: document.getElementById('mueble-subscription').checked
+                    reparables: document.getElementById('reparables-subscription').checked,
+                    otros: document.getElementById('otros-subscription').checked
                 };
                 
                 // Actualizar UI
@@ -530,9 +575,9 @@
                 };
                 
                 if (subscriptions.madera) addFilter('Madera', 'madera');
-                if (subscriptions.electronico) addFilter('Electrónicos', 'electronico');
                 if (subscriptions.plastico) addFilter('Plástico', 'plastico');
-                if (subscriptions.mueble) addFilter('Muebles', 'mueble');
+                if (subscriptions.reparables) addFilter('Reparables', 'reparables');
+                if (subscriptions.otros) addFilter('Otros Materiales', 'otros');
                 
                 modal.style.display = 'none';
                 filterProducts();
@@ -542,21 +587,30 @@
             function filterProducts() {
                 const productCards = document.querySelectorAll('.product-card');
                 const activeFilters = [];
+                const etiquetasPorFiltro = {
+                    textil: ['Textiles', 'Ropa', 'Telas', 'Retazos', 'Cuero', 'Lana', 'Algodón', 'Mezclilla'],
+                    metal: ['Chatarra', 'Metales', 'Aluminio', 'Cobre', 'Acero', 'Hierro', 'Cables', 'Electrodomésticos'],
+                    madera: ['Madera', 'Muebles', 'Tablas', 'Pallets', 'Troncos', 'Ramas', 'Aserrín', 'Carpintería'],
+                    plastico: ['Plástico', 'PET', 'HDPE', 'PVC', 'LDPE', 'PP', 'PS', 'Envases', 'Botellas'],
+                    reparables: ['Electrodomésticos', 'Computadores', 'Teléfonos', 'Bicicletas', 'Muebles', 'Herramientas', 'Electrónicos', 'Máquinas'],
+                    otros: ['Vidrio', 'Cartón', 'Papel', 'Equipos electrónicos', 'Instrumentos musicales', 'Materiales varios', 'Reciclables', 'Reutilizables']
+                };
                 
                 // Recopilar filtros activos
                 if (document.getElementById('textil-subscription').checked) activeFilters.push('textil');
                 if (document.getElementById('metal-subscription').checked) activeFilters.push('metal');
                 if (document.getElementById('madera-subscription').checked) activeFilters.push('madera');
-                if (document.getElementById('electronico-subscription').checked) activeFilters.push('electronico');
                 if (document.getElementById('plastico-subscription').checked) activeFilters.push('plastico');
-                if (document.getElementById('mueble-subscription').checked) activeFilters.push('mueble');
+                if (document.getElementById('reparables-subscription').checked) activeFilters.push('reparables');
+                if (document.getElementById('otros-subscription').checked) activeFilters.push('otros');
                 
                 // Mostrar mensaje si no hay filtros activos
                 const emptyState = document.querySelector('.empty-state');
+                const productsGrid = document.querySelector('.products-grid');
+                
                 if (activeFilters.length === 0) {
                     // Si no existe el estado vacío, crearlo
                     if (!emptyState) {
-                        const productsGrid = document.querySelector('.products-grid');
                         const emptyDiv = document.createElement('div');
                         emptyDiv.className = 'empty-state';
                         emptyDiv.innerHTML = `
@@ -565,6 +619,11 @@
                             <p>Selecciona al menos una categoría para ver productos.</p>
                         `;
                         
+                        // Guardar productos originales para poder restaurarlos
+                        if (!productsGrid.originalHTML) {
+                            productsGrid.originalHTML = productsGrid.innerHTML;
+                        }
+                        
                         // Limpiar grid y añadir mensaje
                         productsGrid.innerHTML = '';
                         productsGrid.appendChild(emptyDiv);
@@ -572,31 +631,67 @@
                     return;
                 }
                 
-                // Ocultar mensaje de vacío si existe
-                if (emptyState) emptyState.style.display = 'none';
+                // Restaurar productos originales si hay filtros activos
+                if (productsGrid.originalHTML && emptyState) {
+                    productsGrid.innerHTML = productsGrid.originalHTML;
+                }
                 
-                // Ocultar todos los productos inicialmente
-                productCards.forEach(card => {
-                    card.style.display = 'none';
+                // Crear una lista plana de todas las etiquetas activas
+                const todasEtiquetasActivas = [];
+                activeFilters.forEach(filter => {
+                    if (etiquetasPorFiltro[filter]) {
+                        todasEtiquetasActivas.push(...etiquetasPorFiltro[filter]);
+                    }
                 });
                 
-                // Mostrar productos que coinciden con los filtros activos
+                // Filtrar productos según las etiquetas seleccionadas
                 productCards.forEach(card => {
                     const categories = card.querySelectorAll('.product-category');
-                    let showCard = false;
+                    let matchesFilter = false;
                     
                     categories.forEach(category => {
                         const categoryText = category.textContent.toLowerCase();
-                        if (activeFilters.some(filter => categoryText.includes(filter))) {
-                            showCard = true;
+                        if (todasEtiquetasActivas.some(etiqueta => 
+                            categoryText.toLowerCase().includes(etiqueta.toLowerCase()))) {
+                            matchesFilter = true;
                         }
                     });
                     
-                    if (showCard) {
-                        card.style.display = 'block';
+                    // Mostrar u ocultar según coincidencia
+                    card.style.display = matchesFilter ? 'block' : 'none';
+                });
+                
+                // Verificar si hay productos visibles
+                let visibleProducts = false;
+                productCards.forEach(card => {
+                    if (card.style.display !== 'none') {
+                        visibleProducts = true;
                     }
                 });
+                
+                // Mostrar mensaje si no hay productos que coincidan con los filtros
+                if (!visibleProducts && !document.querySelector('.empty-state')) {
+                    const emptyDiv = document.createElement('div');
+                    emptyDiv.className = 'empty-state';
+                    emptyDiv.innerHTML = `
+                        <i class="fas fa-search" style="font-size: 3rem; color: var(--gris-reciclaje); margin-bottom: 20px;"></i>
+                        <h3>No hay productos que coincidan</h3>
+                        <p>No hay productos disponibles para las categorías seleccionadas.</p>
+                    `;
+                    
+                    productsGrid.appendChild(emptyDiv);
+                }
             }
+        }
+
+        // Llamar a filterProducts al cargar la página para aplicar los filtros iniciales
+        if (document.getElementById('textil-subscription') && document.getElementById('metal-subscription')) {
+            document.addEventListener('DOMContentLoaded', function() {
+                // Por defecto, marcar las suscripciones iniciales
+                document.getElementById('textil-subscription').checked = true;
+                document.getElementById('metal-subscription').checked = true;
+                filterProducts();
+            });
         }
     </script>
     

@@ -393,18 +393,65 @@
             background-color: var(--verde-bosque);
         }
         
+        /* Mejoras de responsividad */
         @media (max-width: 768px) {
             .hero h1 {
-                font-size: 2.5rem;
+                font-size: 2rem;
+                padding: 0 15px;
+            }
+            
+            .hero p {
+                padding: 0 15px;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 8px;
+                margin: 10px 0;
             }
             
             nav {
                 flex-direction: column;
-                gap: 15px;
+                padding: 15px 0;
             }
             
-            .nav-links {
-                margin: 15px 0;
+            .how-it-works-grid,
+            .features-grid,
+            .providers-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .feature-card {
+                padding: 20px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .logo {
+                font-size: 1.5rem;
+            }
+            
+            .cta-button {
+                padding: 8px 15px;
+                font-size: 0.9rem;
+            }
+            
+            .how-it-works-step {
+                margin-bottom: 30px;
+            }
+            
+            .testimonial-content {
+                padding: 20px;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 30px;
+            }
+            
+            .footer-column {
+                width: 100%;
             }
         }
     </style>

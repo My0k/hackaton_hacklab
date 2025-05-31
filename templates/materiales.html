@@ -163,6 +163,55 @@
             margin: 0 auto 30px;
             color: #555;
         }
+        
+        /* Mejoras de responsividad */
+        @media (max-width: 768px) {
+            .materials-title {
+                font-size: 1.8rem;
+            }
+            
+            .materials-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 8px;
+            }
+            
+            .material-card {
+                flex-direction: column;
+            }
+            
+            .material-image {
+                width: 100%;
+                height: 200px;
+            }
+            
+            .material-content {
+                padding: 20px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .examples-list {
+                justify-content: center;
+            }
+            
+            .cta-materials h2 {
+                font-size: 1.6rem;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 30px;
+            }
+            
+            .footer-column {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>

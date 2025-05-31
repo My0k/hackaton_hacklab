@@ -98,8 +98,58 @@
         }
         
         @media (max-width: 768px) {
+            .receptores-title {
+                font-size: 1.8rem;
+            }
+            
+            .receptores-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 8px;
+            }
+            
+            .filter-options {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+        }
+        
+        @media (max-width: 480px) {
             .receptor-card {
                 flex-direction: column;
+            }
+            
+            .receptor-logo {
+                width: 100%;
+                height: auto;
+                border-radius: 10px 10px 0 0;
+            }
+            
+            .receptor-logo img {
+                border-radius: 10px 10px 0 0;
+            }
+            
+            .receptor-details {
+                padding: 20px;
+            }
+            
+            .receptor-meta {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 30px;
+            }
+            
+            .footer-column {
+                width: 100%;
             }
         }
         

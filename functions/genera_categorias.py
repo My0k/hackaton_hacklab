@@ -120,6 +120,8 @@ def generar_descripcion_larga(descripcion_corta, imagen_archivo=None):
     - Cuanto material se puede reciclar o reutilizar
     - Cantidad estimada o dimensiones aproximadas
     - Potencial de reciclaje o reutilización
+    - Si se considera posible, indicar Si es reparable o reutilizable indicarlo y priorizar la reparación o reutilización
+    - IMPORTANTE: Si notas alguna discrepancia entre lo que muestra la imagen y lo que indica la descripción, señálalo al inicio con la frase "Nota: "
     
     Descripción breve: """ + descripcion_corta
     

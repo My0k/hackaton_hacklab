@@ -334,20 +334,19 @@ def crear_revamp():
             descripcion = request.form.get('details', '')
             descripcion_larga = request.form.get('descripcion_larga', '')
             categorias = request.form.get('categorias', '')
-            costo_envio = request.form.get('shipping_cost', '1000')
+            costo_envio = request.form.get('shipping_cost', '1000')  # Por defecto 1000
             
             # Manejar la imagen
             imagen_url = ''
             if 'photo' in request.files and request.files['photo'].filename:
                 # Si se subió un archivo
                 imagen = request.files['photo']
-                # Aquí iría la lógica para guardar la imagen y obtener su URL
-                # Por ejemplo:
+                # Generar nombre único para la imagen
                 nombre_archivo = f"{uuid.uuid4()}_{secure_filename(imagen.filename)}"
-                ruta_guardado = os.path.join('static/uploads', nombre_archivo)
-                os.makedirs('static/uploads', exist_ok=True)
+                ruta_guardado = os.path.join('static', 'uploads', nombre_archivo)
+                os.makedirs(os.path.join('static', 'uploads'), exist_ok=True)
                 imagen.save(ruta_guardado)
-                imagen_url = f"/static/uploads/{nombre_archivo}"
+                imagen_url = nombre_archivo  # Guardar solo el nombre del archivo
             elif 'camera_image' in request.form and request.form['camera_image']:
                 # Si se capturó una imagen con la cámara (base64)
                 b64_imagen = request.form['camera_image'].split(',')[1] if ',' in request.form['camera_image'] else request.form['camera_image']
@@ -355,32 +354,44 @@ def crear_revamp():
                 
                 # Guardar la imagen
                 nombre_archivo = f"{uuid.uuid4()}.jpg"
-                ruta_guardado = os.path.join('static/uploads', nombre_archivo)
-                os.makedirs('static/uploads', exist_ok=True)
+                ruta_guardado = os.path.join('static', 'uploads', nombre_archivo)
+                os.makedirs(os.path.join('static', 'uploads'), exist_ok=True)
                 
                 with open(ruta_guardado, 'wb') as f:
                     f.write(imagen_bytes)
                 
-                imagen_url = f"/static/uploads/{nombre_archivo}"
+                imagen_url = nombre_archivo  # Guardar solo el nombre del archivo
             
-            # Determinar si es descartable (ahora siempre es False ya que eliminamos este campo)
-            descartable = False
+            # Generar un SKU único
+            sku = str(uuid.uuid4())[:8]
             
-            # Agregar a la base de datos o archivo CSV
+            # Determinar si es descartable (ahora siempre es False por el diseño simplificado)
+            descartable = "No"
+            
+            # Configurar el usuario que publica (podría ser dinámico en un futuro)
+            usuario = "Revamper"
+            
+            # Asegurarse de que el archivo CSV existe y tiene encabezados
+            if not os.path.exists('products.csv') or os.path.getsize('products.csv') == 0:
+                with open('products.csv', 'w', newline='', encoding='utf-8') as file:
+                    writer = csv.writer(file)
+                    writer.writerow(['sku', 'titulo', 'descripcion', 'descripcion_larga', 'costo_transporte', 'descartador', 'imagen_url', 'categorias'])
+            
+            # Agregar a la base de datos CSV
             with open('products.csv', 'a', newline='', encoding='utf-8') as file:
                 writer = csv.writer(file)
                 writer.writerow([
-                    str(uuid.uuid4())[:8],  # Generar un SKU simple
+                    sku,
                     titulo,
                     descripcion,
                     descripcion_larga,
                     costo_envio,
-                    'Sí' if descartable else 'No',
+                    usuario,
                     imagen_url,
                     categorias
                 ])
             
-            return render_template('crear_revamp.html', mensaje="¡Tu Revamp ha sido creado con éxito!")
+            return render_template('crear_revamp.html', mensaje=f"¡Tu Revamp ha sido creado con éxito! Se ha asignado el SKU {sku}.")
         
         except Exception as e:
             app.logger.error(f"Error en crear_revamp: {str(e)}")

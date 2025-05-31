@@ -242,6 +242,47 @@
                 padding: 8px;
             }
         }
+        
+        /* Estilos específicos para la cámara */
+        #camera-container {
+            position: relative;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        
+        #camera-preview {
+            width: 100%;
+            max-height: 50vh;
+            object-fit: cover;
+            border-radius: 8px;
+            background-color: #000;
+        }
+        
+        /* Mejoras para móviles */
+        @media (max-width: 768px) {
+            .camera-buttons {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .mobile-camera-button {
+                display: inline-block;
+                margin: 5px;
+                padding: 10px 15px;
+                flex: 1;
+            }
+            
+            .camera-controls {
+                position: relative;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                padding: 10px;
+                background-color: rgba(0,0,0,0.3);
+                border-radius: 0 0 8px 8px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -401,6 +442,11 @@
             let stream = null;
             let facingMode = 'environment'; // 'environment' es la cámara trasera, 'user' es la cámara frontal
             
+            // Verificar si el navegador soporta getUserMedia
+            const hasGetUserMedia = () => {
+                return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+            };
+            
             // Manejo del contenedor de upload
             photoUploadContainer.addEventListener('click', function() {
                 photoInput.click();
@@ -413,7 +459,13 @@
             
             // Manejo del botón para abrir la cámara
             openCameraButton.addEventListener('click', function() {
-                startCamera();
+                if (hasGetUserMedia()) {
+                    startCamera();
+                } else {
+                    alert('Tu navegador no soporta acceso a la cámara. Intenta actualizar tu navegador o usar otro dispositivo.');
+                    // Caer en la opción de subir foto
+                    photoInput.click();
+                }
             });
             
             // Previsualización de la foto seleccionada del dispositivo
@@ -435,6 +487,9 @@
             
             // Función para iniciar la cámara
             function startCamera() {
+                // Mostrar mensaje de carga
+                photoUploadContainer.innerHTML = '<p>Accediendo a la cámara...</p>';
+                
                 // Ocultar el contenedor de upload y mostrar la cámara
                 photoUploadContainer.style.display = 'none';
                 cameraContainer.style.display = 'block';
@@ -442,23 +497,29 @@
                 // Configurar las opciones de la cámara
                 const constraints = {
                     video: {
-                        facingMode: facingMode,
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 }
+                        facingMode: facingMode
                     },
                     audio: false
                 };
                 
+                console.log('Solicitando acceso a la cámara con opciones:', constraints);
+                
                 // Solicitar acceso a la cámara
                 navigator.mediaDevices.getUserMedia(constraints)
                     .then(function(mediaStream) {
+                        console.log('Acceso a la cámara concedido');
                         stream = mediaStream;
+                        
+                        // En algunos navegadores móviles necesitamos asegurarnos de que el video está listo
+                        cameraPreview.onloadedmetadata = function(e) {
+                            cameraPreview.play();
+                        };
+                        
                         cameraPreview.srcObject = stream;
-                        cameraPreview.play();
                     })
                     .catch(function(error) {
-                        console.error('Error accessing camera:', error);
-                        alert('No se pudo acceder a la cámara. Asegúrate de permitir el acceso a la cámara o usa la opción de subir foto.');
+                        console.error('Error al acceder a la cámara:', error);
+                        alert('No se pudo acceder a la cámara: ' + error.message + '. Asegúrate de permitir el acceso a la cámara o usa la opción de subir foto.');
                         stopCamera();
                     });
             }
@@ -466,45 +527,77 @@
             // Función para detener la cámara
             function stopCamera() {
                 if (stream) {
-                    stream.getTracks().forEach(track => track.stop());
+                    stream.getTracks().forEach(track => {
+                        console.log('Deteniendo track:', track);
+                        track.stop();
+                    });
                     stream = null;
                 }
                 
                 cameraPreview.srcObject = null;
                 cameraContainer.style.display = 'none';
                 photoUploadContainer.style.display = 'block';
+                photoUploadContainer.innerHTML = `
+                    <i class="fas fa-camera photo-icon"></i>
+                    <p class="photo-upload-text">Haz clic para subir una foto o arrastrar y soltar</p>
+                    <img id="photoPreview" class="photo-preview" alt="Vista previa de la foto">
+                `;
+                
+                // Recuperar la referencia a la vista previa
+                photoPreview = document.getElementById('photoPreview');
             }
             
             // Capturar foto desde la cámara
             takePhotoBtn.addEventListener('click', function() {
-                if (!stream) return;
+                if (!stream) {
+                    console.error('No hay stream de cámara activo');
+                    return;
+                }
                 
-                // Crear un canvas para capturar la imagen
-                const canvas = document.createElement('canvas');
-                const context = canvas.getContext('2d');
-                
-                // Establecer dimensiones del canvas
-                canvas.width = cameraPreview.videoWidth;
-                canvas.height = cameraPreview.videoHeight;
-                
-                // Dibujar el frame actual en el canvas
-                context.drawImage(cameraPreview, 0, 0, canvas.width, canvas.height);
-                
-                // Convertir el canvas a una URL de datos
-                const dataURL = canvas.toDataURL('image/jpeg');
-                
-                // Mostrar la vista previa y guardar los datos
-                photoPreview.src = dataURL;
-                photoPreview.style.display = 'block';
-                
-                // Almacenar la imagen en el campo oculto
-                cameraImageData.value = dataURL;
-                
-                // Limpiar el input de archivo para que no haya conflictos
-                photoInput.value = '';
-                
-                // Cerrar la cámara
-                stopCamera();
+                try {
+                    // Crear un canvas para capturar la imagen
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+                    
+                    // Verificar dimensiones del video
+                    const videoWidth = cameraPreview.videoWidth;
+                    const videoHeight = cameraPreview.videoHeight;
+                    
+                    console.log('Dimensiones del video:', videoWidth, 'x', videoHeight);
+                    
+                    if (videoWidth === 0 || videoHeight === 0) {
+                        alert('No se puede capturar la imagen. La cámara no está lista.');
+                        return;
+                    }
+                    
+                    // Establecer dimensiones del canvas
+                    canvas.width = videoWidth;
+                    canvas.height = videoHeight;
+                    
+                    // Dibujar el frame actual en el canvas
+                    context.drawImage(cameraPreview, 0, 0, canvas.width, canvas.height);
+                    
+                    // Convertir el canvas a una URL de datos
+                    const dataURL = canvas.toDataURL('image/jpeg', 0.8);
+                    
+                    console.log('Imagen capturada correctamente');
+                    
+                    // Mostrar la vista previa y guardar los datos
+                    photoPreview.src = dataURL;
+                    photoPreview.style.display = 'block';
+                    
+                    // Almacenar la imagen en el campo oculto
+                    cameraImageData.value = dataURL;
+                    
+                    // Limpiar el input de archivo para que no haya conflictos
+                    photoInput.value = '';
+                    
+                    // Cerrar la cámara
+                    stopCamera();
+                } catch (error) {
+                    console.error('Error al capturar foto:', error);
+                    alert('Ocurrió un error al capturar la foto: ' + error.message);
+                }
             });
             
             // Cambiar entre cámaras (frontal/trasera)
@@ -513,6 +606,7 @@
                 
                 // Cambiar el modo de la cámara
                 facingMode = facingMode === 'environment' ? 'user' : 'environment';
+                console.log('Cambiando a cámara:', facingMode);
                 
                 // Detener la cámara actual
                 stopCamera();
